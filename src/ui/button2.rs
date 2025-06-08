@@ -37,7 +37,6 @@ fn spawn_button(commands: &mut Commands, asset_server: &AssetServer) {
         .build();
 
     let text = TextBuilder::new()
-        .id("a")
         .content("Button")
         .font(text_font)
         .color(Color::srgb(0.9, 0.9, 0.9))

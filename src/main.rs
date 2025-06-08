@@ -5,6 +5,7 @@ use crate::builder::button_builder::ButtonBuilder;
 use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
 use bevy::{prelude::*, winit::WinitSettings};
+use crate::builder::text_field_builder::TextFieldBuilder;
 // use crate::ui::button2::ButtonPlugin2;
 // use crate::builder::button_builder::ButtonBuilder;
 use crate::ui::flex::FlexPlugin;
@@ -38,8 +39,8 @@ fn setup_panels(mut commands: Commands, _asset_server: Res<AssetServer>) {
         .column(vec![GridTrack::flex(1.0), GridTrack::min_content()])
         .border(UiRect::all(Val::Px(5.0)))
         .build_and_spawn(&mut commands);
-    let text = TextBuilder::new()
-        .node(NodeBuilder::new().border(UiRect::all(Val::Px(5.0))).build())
+    let text = TextFieldBuilder::new()
+        .node(NodeBuilder::new().border(UiRect::all(Val::Px(5.0))).margin(UiRect::all(Val::Px(5.0))).build())
         .build_and_spawn(&mut commands);
     let button = ButtonBuilder::new(
         NodeBuilder::new()

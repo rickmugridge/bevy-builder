@@ -1,10 +1,16 @@
+use crate::builder::box_builder::BoxBuilder;
 use bevy::prelude::*;
 use bevy::ui::ContentSize;
 use bevy::ui::widget::TextNodeFlags;
 
-#[derive(Debug, Component)]
+#[derive(Debug, Component, Default)]
+#[require(Interaction)]
+pub struct TextField {
+    id: String,
+}
 
-pub struct TextBuilder {
+pub struct TextFieldBuilder {
+    text_field: TextField,
     content: String,
     font: TextFont,
     color: Color,
@@ -12,12 +18,14 @@ pub struct TextBuilder {
     linebreak: LineBreak,
     shadow_color: Color,
     shadow_offset: Vec2,
+    border_color: BorderColor,
     node: Node,
 }
 
-impl TextBuilder {
+impl TextFieldBuilder {
     pub fn new() -> Self {
         Self {
+            text_field: TextField::default(),
             content: "Default".to_string(),
             font: TextFont::default(),
             color: Color::WHITE,
@@ -25,10 +33,16 @@ impl TextBuilder {
             linebreak: LineBreak::default(),
             shadow_color: Color::NONE,
             shadow_offset: Vec2::ZERO,
+            border_color: BorderColor::from(Color::WHITE),
             node: Node::default(),
         }
     }
-    
+
+    pub fn id<S: Into<String>>(mut self, id: S) -> Self {
+        self.text_field.id = id.into();
+        self
+    }
+
     pub fn content<S: Into<String>>(mut self, content: S) -> Self {
         self.content = content.into();
         self
@@ -65,9 +79,16 @@ impl TextBuilder {
         self
     }
 
+    pub fn border_color(mut self, border_color: Color) -> Self {
+        self.border_color = BorderColor::from(border_color);
+        self
+    }
+
     pub fn build_and_spawn(self, commands: &mut Commands) -> Entity {
         let text = (
             Text::new(self.content),
+            self.text_field,
+            self.border_color,
             self.font,
             TextColor(self.color),
             TextLayout::new(self.justify_text, self.linebreak),
@@ -77,8 +98,15 @@ impl TextBuilder {
             },
             TextNodeFlags::default(),
             ContentSize::default(),
+            BackgroundColor(Color::srgb(0.2, 0.2, 0.2)), // todo has no impact. Why?
             self.node,
         );
-        commands.spawn(text).id()
+        let border_node = BoxBuilder::new()
+            .border_color(Color::WHITE)
+            .border_of(Val::Px(1.))
+            .build_and_spawn(commands);
+        let text_entity = commands.spawn(text).id();
+        commands.entity(border_node).add_child(text_entity);
+        border_node
     }
 }

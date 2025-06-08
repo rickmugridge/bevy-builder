@@ -2,5 +2,6 @@ pub mod button_builder;
 pub mod text_builder;
 pub mod node_builder;
 pub mod text_font_builder;
-mod image_builder;
-mod box_builder;
+pub mod image_builder;
+pub mod box_builder;
+pub mod text_field_builder;

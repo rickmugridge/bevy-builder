@@ -193,11 +193,6 @@ impl NodeBuilder {
     }
 
     pub fn build_and_spawn(self, commands: &mut Commands) -> Entity {
-        let id = commands.spawn(self.build()).id();
-        commands
-            .entity(id)
-            .insert(BorderColor(Color::Srgba(Srgba::RED)));
-
-        id
+        commands.spawn(self.build()).id()
     }
 }
