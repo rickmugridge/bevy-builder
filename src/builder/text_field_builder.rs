@@ -1,7 +1,7 @@
 use crate::builder::box_builder::BoxBuilder;
 use bevy::prelude::*;
-use bevy::ui::ContentSize;
 use bevy::ui::widget::TextNodeFlags;
+use bevy::ui::ContentSize;
 
 #[derive(Debug, Component, Default)]
 #[require(Interaction)]
@@ -28,7 +28,7 @@ impl TextFieldBuilder {
             text_field: TextField::default(),
             content: "Default".to_string(),
             font: TextFont::default(),
-            color: Color::WHITE,
+            color: Color::BLACK,
             justify_text: JustifyText::default(),
             linebreak: LineBreak::default(),
             shadow_color: Color::NONE,
@@ -98,7 +98,7 @@ impl TextFieldBuilder {
             },
             TextNodeFlags::default(),
             ContentSize::default(),
-            BackgroundColor(Color::srgb(0.2, 0.2, 0.2)), // todo has no impact. Why?
+            BackgroundColor(Color::WHITE), // This has no impact because text_field_hover() sets it as WHITE on first, auto, Update
             self.node,
         );
         let border_node = BoxBuilder::new()

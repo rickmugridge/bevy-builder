@@ -1,16 +1,14 @@
 mod builder;
-mod ui;
+mod ui_plugin;
 
 use crate::builder::button_builder::ButtonBuilder;
 use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
-use bevy::{prelude::*, winit::WinitSettings};
 use crate::builder::text_field_builder::TextFieldBuilder;
-// use crate::ui::button2::ButtonPlugin2;
-// use crate::builder::button_builder::ButtonBuilder;
-use crate::ui::flex::FlexPlugin;
-// use crate::ui::boxed::BoxedPlugin;
-// use crate::ui::text::TextPlugin;
+use bevy::prelude::*;
+use crate::ui_plugin::button::ButtonPlugin;
+use crate::ui_plugin::text_field::TextFieldPlugin;
+
 const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
 
 fn main() {
@@ -23,6 +21,7 @@ fn main() {
             }),
             ..default()
         }))
+        .add_plugins((TextFieldPlugin, ButtonPlugin))
         .insert_resource(ClearColor(Color::srgb(0.05, 0.15, 0.25)))
         .add_systems(Startup, setup_panels)
         .run();
@@ -40,6 +39,7 @@ fn setup_panels(mut commands: Commands, _asset_server: Res<AssetServer>) {
         .border(UiRect::all(Val::Px(5.0)))
         .build_and_spawn(&mut commands);
     let text = TextFieldBuilder::new()
+        .id("text-field")
         .node(NodeBuilder::new().border(UiRect::all(Val::Px(5.0))).margin(UiRect::all(Val::Px(5.0))).build())
         .build_and_spawn(&mut commands);
     let button = ButtonBuilder::new(
@@ -60,13 +60,3 @@ fn setup_panels(mut commands: Commands, _asset_server: Res<AssetServer>) {
     commands.entity(container).add_children(&[text, button]);
 }
 
-fn _temporary() {
-    App::new()
-        .add_plugins((DefaultPlugins, FlexPlugin))
-        // .add_plugins((DefaultPlugins, TextPlugin))
-        // .add_plugins((DefaultPlugins, ButtonPlugin2))
-        // .add_plugins((DefaultPlugins, BoxedPlugin))
-        // Only run the app when there is user input. This will significantly reduce CPU/GPU use.
-        .insert_resource(WinitSettings::desktop_app())
-        .run();
-}
