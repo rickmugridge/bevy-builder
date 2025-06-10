@@ -1,13 +1,14 @@
 mod builder;
+mod display_panel;
+mod edit_panel;
 mod ui_plugin;
 
-use crate::builder::button_builder::ButtonBuilder;
 use crate::builder::node_builder::NodeBuilder;
-use crate::builder::text_builder::TextBuilder;
-use crate::builder::text_field_builder::TextFieldBuilder;
-use bevy::prelude::*;
+use crate::display_panel::setup_display_panel;
+use crate::edit_panel::setup_edit_panel;
 use crate::ui_plugin::button::ButtonPlugin;
 use crate::ui_plugin::text_field::TextFieldPlugin;
+use bevy::prelude::*;
 
 const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
 
@@ -28,35 +29,16 @@ fn main() {
 }
 
 fn setup_panels(mut commands: Commands, _asset_server: Res<AssetServer>) {
-    // let font = asset_server.load("fonts/FiraSans-Bold.ttf");
     commands.spawn(Camera2d);
     let container = NodeBuilder::new()
         .width(Val::Percent(100.0))
         .height(Val::Percent(100.0))
         .align_items(AlignItems::Center)
         .justify_content(JustifyContent::Center)
-        .column(vec![GridTrack::flex(1.0), GridTrack::min_content()])
+        .column(vec![GridTrack::flex(1.0), GridTrack::flex(1.0)])
         .border(UiRect::all(Val::Px(5.0)))
         .build_and_spawn(&mut commands);
-    let text = TextFieldBuilder::new()
-        .id("text-field")
-        .node(NodeBuilder::new().border(UiRect::all(Val::Px(5.0))).margin(UiRect::all(Val::Px(5.0))).build())
-        .build_and_spawn(&mut commands);
-    let button = ButtonBuilder::new(
-        NodeBuilder::new()
-            .width(Val::Px(150.0))
-            .height(Val::Px(65.0))
-            .justify_content(JustifyContent::Center)
-            .align_items(AlignItems::Center)
-            .border(UiRect::all(Val::Px(5.0)))
-            .build(),
-        TextBuilder::new().build_and_spawn(&mut commands),
-    )
-    .justify_content(JustifyContent::Center)
-    .align_items(AlignItems::Center)
-    .background_color(NORMAL_BUTTON)
-    .border_color(Color::WHITE)
-    .build_and_spawn(&mut commands);
-    commands.entity(container).add_children(&[text, button]);
+    let edit_panel = setup_edit_panel(&mut commands, &_asset_server);
+    let display_panel = setup_display_panel(&mut commands, &_asset_server);
+    commands.entity(container).add_children(&[edit_panel, display_panel]);
 }
-

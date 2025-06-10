@@ -1,4 +1,5 @@
 use bevy::color::Color;
+use bevy::color::palettes::basic::RED;
 use bevy::prelude::{BackgroundColor, BorderColor, Commands, Entity, Node, UiRect, Val};
 
 pub struct BoxBuilder {
@@ -38,7 +39,26 @@ impl BoxBuilder {
         self
     }
 
+    pub fn width(mut self, val: Val) -> Self {
+        self.node.width = val;
+        self
+    }
+
+    pub fn height(mut self, val: Val) -> Self {
+        self.node.height = val;
+        self
+    }
+
+    pub fn full_box(mut self) -> Self {
+        self.width(Val::Percent(100.0))
+            .height(Val::Percent(100.0))
+            .border_color(RED.into())
+            .border_of(Val::Px(1.))
+    }
+
     pub fn build_and_spawn(self, commands: &mut Commands) -> Entity {
-        commands.spawn((self.node, self.border_color, BackgroundColor(Color::BLACK))).id()
+        commands
+            .spawn((self.node, self.border_color, BackgroundColor(Color::BLACK)))
+            .id()
     }
 }

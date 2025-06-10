@@ -19,7 +19,7 @@ impl ButtonBuilder {
     pub fn new(node: Node, text: Entity) -> Self {
         Self {
             id: ButtonId("(none)".to_string()),
-            border_color: Color::BLACK,
+            border_color: Color::WHITE,
             border_radius: BorderRadius::MAX,
             background_color: Color::srgb(0.15, 0.15, 0.15),
             interaction: Interaction::Pressed,

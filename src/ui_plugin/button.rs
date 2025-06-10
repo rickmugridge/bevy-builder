@@ -4,7 +4,7 @@
 
 // https://github.com/bevyengine/bevy/blob/latest/examples/ui/button.rs
 
-use bevy::color::palettes::basic::RED;
+use bevy::color::palettes::basic::{GREEN, RED};
 use bevy::prelude::*;
 
 const NORMAL: Color = Color::srgb(0.15, 0.15, 0.15);
@@ -37,11 +37,11 @@ fn button_hover(
             }
             Interaction::Hovered => {
                 *color = HOVERING.into();
-                border_color.0 = Color::WHITE;
+                border_color.0 = GREEN.into();
             }
             Interaction::None => {
                 *color = NORMAL.into();
-                border_color.0 = Color::BLACK;
+                border_color.0 = Color::WHITE;
             }
         }
     }
