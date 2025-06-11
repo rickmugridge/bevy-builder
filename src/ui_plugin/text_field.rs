@@ -1,4 +1,3 @@
-use std::io::Cursor;
 use crate::builder::text_field_builder::TextField;
 use bevy::app::{App, Plugin};
 use bevy::color::palettes::basic::{GREEN, RED};
@@ -8,11 +7,11 @@ pub struct TextFieldPlugin;
 
 impl Plugin for TextFieldPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (text_field_hover,tick_cursor));
+        app.add_systems(Update, (mouse_handling, tick_cursor));
     }
 }
 
-#[derive(Debug, Component)]
+#[derive(Component, Debug)]
 struct CursorTimer(Timer);
 
 impl CursorTimer {
@@ -21,14 +20,15 @@ impl CursorTimer {
     }
 }
 
-fn text_field_hover(
+fn mouse_handling(
     mut commands: Commands,
     mut interaction_query: Query<
-        (&Interaction, &mut BackgroundColor, Entity),
+        (&Interaction, &mut BackgroundColor, Entity, &mut TextField),
         (Changed<Interaction>, With<TextField>),
     >,
 ) {
-    for (interaction, mut background_color, entity) in interaction_query.iter_mut() {
+    for (interaction, mut background_color, entity, mut text_field) in interaction_query.iter_mut()
+    {
         // println!(
         //     "Button over TextField {:?} {:?}",
         //     interaction, background_color
@@ -36,8 +36,8 @@ fn text_field_hover(
         match *interaction {
             Interaction::Pressed => {
                 background_color.0 = RED.into();
-                commands.entity(entity).insert(CursorTimer::new());
-                // todo Set this as the one selected text field
+                commands.entity(entity).insert(CursorTimer::new()); // also signals it is selected
+                text_field.cursor_on = false;
             }
             Interaction::Hovered => {
                 background_color.0 = GREEN.into();
@@ -52,18 +52,22 @@ fn text_field_hover(
 
 fn tick_cursor(
     mut commands: Commands,
-    mut cursor_timer: Query<(Entity, &mut CursorTimer)>,
+    mut cursor_timer: Query<(&mut Text, &mut TextField, &mut CursorTimer)>,
     time: Res<Time>,
 ) {
-    for (entity, mut cooldown) in &mut cursor_timer {
+    for (mut text, mut text_field, mut cooldown) in &mut cursor_timer {
         cooldown.0.tick(time.delta());
-
-        // todo Instead of the following, add or subtract the cursor from the TextField content
         if cooldown.0.finished() {
             cooldown.0.reset();
-            println!("Ticking cursor");
+            println!("Ticking cursor on {}", text.0);
+            if text_field.cursor_on {
+                text.pop();
+                text_field.cursor_on = false;
+            } else {
+                text.0.push('|');
+                text_field.cursor_on = true;
+            }
             // commands.entity(entity).remove::<CursorTimer>();
         }
     }
 }
-
