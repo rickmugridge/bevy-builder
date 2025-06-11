@@ -2,14 +2,18 @@ use crate::builder::box_builder::BoxBuilder;
 use bevy::prelude::*;
 use bevy::ui::ContentSize;
 use bevy::ui::widget::TextNodeFlags;
+use std::sync::Arc;
 
-#[derive(Debug, Component, Default)]
+#[derive(Component, Default)]
 #[require(Interaction)]
 pub struct TextField {
-    id: String,
+    pub id: String,
     pub cursor_on: bool,
     pub cursor_position: usize,
+    pub on_change: Option<TextChangeCallback>,
 }
+
+type TextChangeCallback = Arc<dyn Fn(String, String) + Send + Sync>;
 
 pub struct TextFieldBuilder {
     text_field: TextField,
@@ -40,6 +44,13 @@ impl TextFieldBuilder {
         }
     }
 
+    pub fn on_change<F>(mut self, callback: F) -> Self
+    where
+        F: Fn(String, String) + Send + Sync + 'static,
+    {
+        self.text_field.on_change = Some(Arc::new(callback));
+        self
+    }
     pub fn id<S: Into<String>>(mut self, id: S) -> Self {
         self.text_field.id = id.into();
         self

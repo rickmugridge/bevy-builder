@@ -39,3 +39,5 @@ We want our `TextField` to signal any changes through an event. We use that to w
 
 Question: Do we have to have a big dispatch on the events, based on id, or do we have a way for Query<> to help us?
 Perhaps we can pass in a closure to TextField, and that's responsible for firing the right event.
+
+See https://taintedcoders.com/bevy/events and https://github.com/bevyengine/bevy/blob/latest/examples/ecs/event.rs
