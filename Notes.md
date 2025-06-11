@@ -1,5 +1,11 @@
 # Notes, References to good examples
 
+## Button
+
+See `button.rs`.
+
+Also see https://github.com/bevyengine/bevy/blob/latest/examples/ui/button.rs
+
 ## Timer
 
 See https://taintedcoders.com/bevy/timers
@@ -41,3 +47,7 @@ Question: Do we have to have a big dispatch on the events, based on id, or do we
 Perhaps we can pass in a closure to TextField, and that's responsible for firing the right event.
 
 See https://taintedcoders.com/bevy/events and https://github.com/bevyengine/bevy/blob/latest/examples/ecs/event.rs
+
+## Children access in system
+
+See react_to_content_update() in button.rs.

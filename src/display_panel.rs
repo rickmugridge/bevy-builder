@@ -1,8 +1,8 @@
-use crate::NORMAL_BUTTON;
 use crate::builder::box_builder::BoxBuilder;
 use crate::builder::button_builder::ButtonBuilder;
 use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
+use crate::{DESTINATION_BUTTON, NORMAL_BUTTON};
 use bevy::asset::AssetServer;
 use bevy::prelude::*;
 
@@ -19,6 +19,7 @@ pub fn setup_display_panel(commands: &mut Commands, _asset_server: &Res<AssetSer
             .build(),
         TextBuilder::new().build_and_spawn(commands),
     )
+    .id(DESTINATION_BUTTON)
     .justify_content(JustifyContent::Center)
     .align_items(AlignItems::Center)
     .background_color(NORMAL_BUTTON)

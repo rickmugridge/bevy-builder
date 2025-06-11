@@ -100,7 +100,7 @@ fn keyboard_input(
                 text_field.cursor_position -= 1;
                 if let Some(on_change) = &text_field.on_change {
                     let text = text_without_cursor(text.0.clone(), &text_field);
-                    on_change(text_field.id.clone(), text, &mut commands);
+                    on_change(text, &mut commands);
                 }
             }
             (Key::ArrowLeft, _) => {
@@ -115,7 +115,7 @@ fn keyboard_input(
                     text_field.cursor_position += 1;
                     if let Some(on_change) = &text_field.on_change {
                         let text = text_without_cursor(text.0.clone(), &text_field);
-                        on_change(text_field.id.clone(), text, &mut commands);
+                        on_change(text, &mut commands);
                     }
                 }
             }

@@ -13,7 +13,7 @@ pub struct ButtonBuilder {
 }
 
 #[derive(Debug, Component)]
-pub struct ButtonId(String);
+pub struct ButtonId(pub String);
 
 impl ButtonBuilder {
     pub fn new(node: Node, text: Entity) -> Self {

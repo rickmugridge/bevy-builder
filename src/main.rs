@@ -3,6 +3,7 @@ mod display_panel;
 mod edit_panel;
 mod ui_plugin;
 
+use std::string::ToString;
 use crate::builder::node_builder::NodeBuilder;
 use crate::display_panel::setup_display_panel;
 use crate::edit_panel::setup_edit_panel;
@@ -25,6 +26,7 @@ fn main() {
         .add_plugins((TextFieldPlugin, ButtonPlugin))
         .insert_resource(ClearColor(Color::srgb(0.05, 0.15, 0.25)))
         .add_systems(Startup, setup_panels)
+        .add_event::<ButtonNameChange>()
         .run();
 }
 
@@ -40,5 +42,15 @@ fn setup_panels(mut commands: Commands, _asset_server: Res<AssetServer>) {
         .build_and_spawn(&mut commands);
     let edit_panel = setup_edit_panel(&mut commands, &_asset_server);
     let display_panel = setup_display_panel(&mut commands, &_asset_server);
-    commands.entity(container).add_children(&[edit_panel, display_panel]);
+    commands
+        .entity(container)
+        .add_children(&[edit_panel, display_panel]);
 }
+
+#[derive(Event, Debug)]
+struct ButtonNameChange {
+    destination_id: String,
+    name: String,
+}
+
+const DESTINATION_BUTTON: &str = "destination";

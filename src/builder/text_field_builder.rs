@@ -13,7 +13,7 @@ pub struct TextField {
     pub on_change: Option<TextChangeCallback>,
 }
 
-type TextChangeCallback = Arc<dyn Fn(String, String, &mut Commands) + Send + Sync>;
+type TextChangeCallback = Arc<dyn Fn(String, &mut Commands) + Send + Sync>;
 
 pub struct TextFieldBuilder {
     text_field: TextField,
@@ -46,7 +46,7 @@ impl TextFieldBuilder {
 
     pub fn on_change<F>(mut self, callback: F) -> Self
     where
-        F: Fn(String, String, &mut Commands) + Send + Sync + 'static,
+        F: Fn(String, &mut Commands) + Send + Sync + 'static,
     {
         self.text_field.on_change = Some(Arc::new(callback));
         self
