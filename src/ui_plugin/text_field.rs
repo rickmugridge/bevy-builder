@@ -82,21 +82,25 @@ fn keyboard_input(
         if !event.state.is_pressed() {
             continue;
         }
-        println!(
-            "KB: {:?}/{:?} for {} at {}",
-            &event.logical_key, &event.text, text.0, text_field.cursor_position
-        );
+        // println!(
+        //     "KB: {:?}/{:?} for {} at {}",
+        //     &event.logical_key, &event.text, text.0, text_field.cursor_position
+        // );
 
         match (&event.logical_key, &event.text) {
             (Key::Enter, _) => {
                 commands.entity(entity).remove::<CursorTimer>();
+                if text_field.cursor_on {
+                    text.remove(text_field.cursor_position);
+                    text_field.cursor_on = false;
+                }
             }
             (Key::Backspace, _) => {
                 text.remove(text_field.cursor_position - 1);
                 text_field.cursor_position -= 1;
                 if let Some(on_change) = &text_field.on_change {
                     let text = text_without_cursor(text.0.clone(), &text_field);
-                    on_change(text_field.id.clone(), text);
+                    on_change(text_field.id.clone(), text, &mut commands);
                 }
             }
             (Key::ArrowLeft, _) => {
@@ -111,7 +115,7 @@ fn keyboard_input(
                     text_field.cursor_position += 1;
                     if let Some(on_change) = &text_field.on_change {
                         let text = text_without_cursor(text.0.clone(), &text_field);
-                        on_change(text_field.id.clone(), text);
+                        on_change(text_field.id.clone(), text, &mut commands);
                     }
                 }
             }

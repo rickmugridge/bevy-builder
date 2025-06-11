@@ -30,7 +30,7 @@ pub fn setup_edit_panel(commands: &mut Commands, _asset_server: &Res<AssetServer
                 .margin(UiRect::all(Val::Px(5.0)))
                 .build(),
         )
-        .on_change(|id, s| println!("on_change of {}: {}", id, s))
+        .on_change(|id, s, commands| println!("on_change of {}: {}", id, s))
         .build_and_spawn(commands);
     commands.entity(border_node).add_child(container);
     commands.entity(container).add_children(&[label, text]);
