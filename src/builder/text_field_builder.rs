@@ -1,19 +1,14 @@
 use crate::builder::box_builder::BoxBuilder;
 use bevy::prelude::*;
-use bevy::ui::widget::TextNodeFlags;
 use bevy::ui::ContentSize;
+use bevy::ui::widget::TextNodeFlags;
 
 #[derive(Debug, Component, Default)]
 #[require(Interaction)]
 pub struct TextField {
     id: String,
-    pub cursor_on:bool,
-    pub cursor_position:u32,
-}
-
-pub enum CursorState {
-    Active(u32),
-    Inactive,
+    pub cursor_on: bool,
+    pub cursor_position: usize,
 }
 
 pub struct TextFieldBuilder {
@@ -91,7 +86,8 @@ impl TextFieldBuilder {
         self
     }
 
-    pub fn build_and_spawn(self, commands: &mut Commands) -> Entity {
+    pub fn build_and_spawn(mut self, commands: &mut Commands) -> Entity {
+        self.text_field.cursor_position = self.content.len();
         let text = (
             Text::new(self.content),
             self.text_field,

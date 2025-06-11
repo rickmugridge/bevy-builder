@@ -59,12 +59,16 @@ fn tick_cursor(
         cooldown.0.tick(time.delta());
         if cooldown.0.finished() {
             cooldown.0.reset();
-            // println!("Ticking cursor on {}", text.0);
+            println!(
+                "Ticking cursor on {} at {}",
+                text.0, text_field.cursor_position
+            );
             if text_field.cursor_on {
-                text.pop();
+                text.remove(text_field.cursor_position);
                 text_field.cursor_on = false;
             } else {
-                text.0.push('|');
+                text.0.insert(text_field.cursor_position, '|');
+                // text_field.cursor_position += 1;
                 text_field.cursor_on = true;
             }
             // commands.entity(entity).remove::<CursorTimer>();
@@ -75,17 +79,17 @@ fn tick_cursor(
 fn keyboard_input(
     mut commands: Commands,
     mut events: EventReader<KeyboardInput>,
-    edit_text: Single<(&mut Text, &CursorTimer, &TextField, Entity)>,
+    edit_text: Single<(&mut Text, &CursorTimer, &mut TextField, Entity)>,
 ) {
-    let (mut text, cursor_timer, text_field, entity) = edit_text.into_inner();
+    let (mut text, cursor_timer, mut text_field, entity) = edit_text.into_inner();
     for event in events.read() {
         // Only trigger changes when the key is first pressed.
         if !event.state.is_pressed() {
             continue;
         }
         println!(
-            "KB: {:?}, {:?} for {}",
-            &event.logical_key, &event.text, text.0
+            "KB: {:?}/{:?} for {} at {}",
+            &event.logical_key, &event.text, text.0, text_field.cursor_position
         );
 
         match (&event.logical_key, &event.text) {
@@ -93,11 +97,19 @@ fn keyboard_input(
                 commands.entity(entity).remove::<CursorTimer>();
             }
             (Key::Backspace, _) => {
-                text.0.pop();
+                text.remove(text_field.cursor_position - 1);
+                text_field.cursor_position -= 1;
+            }
+          (Key::ArrowLeft, _) => {
+                text_field.cursor_position -= 1;
+            }
+         (Key::ArrowRight, _) => {
+                text_field.cursor_position += 1;
             }
             (_, Some(inserted_text)) => {
                 if inserted_text.chars().all(is_printable_char) {
-                    text.push_str(inserted_text);
+                    text.insert_str(text_field.cursor_position, inserted_text);
+                    text_field.cursor_position += 1;
                 }
             }
             _ => continue,
