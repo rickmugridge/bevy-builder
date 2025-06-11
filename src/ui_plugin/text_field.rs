@@ -1,13 +1,14 @@
 use crate::builder::text_field_builder::TextField;
 use bevy::app::{App, Plugin};
 use bevy::color::palettes::basic::{GREEN, RED};
+use bevy::input::keyboard::{Key, KeyboardInput};
 use bevy::prelude::*;
 
 pub struct TextFieldPlugin;
 
 impl Plugin for TextFieldPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (mouse_handling, tick_cursor));
+        app.add_systems(Update, (mouse_handling, tick_cursor, keyboard_input));
     }
 }
 
@@ -51,7 +52,6 @@ fn mouse_handling(
 }
 
 fn tick_cursor(
-    mut commands: Commands,
     mut cursor_timer: Query<(&mut Text, &mut TextField, &mut CursorTimer)>,
     time: Res<Time>,
 ) {
@@ -59,7 +59,7 @@ fn tick_cursor(
         cooldown.0.tick(time.delta());
         if cooldown.0.finished() {
             cooldown.0.reset();
-            println!("Ticking cursor on {}", text.0);
+            // println!("Ticking cursor on {}", text.0);
             if text_field.cursor_on {
                 text.pop();
                 text_field.cursor_on = false;
@@ -70,4 +70,47 @@ fn tick_cursor(
             // commands.entity(entity).remove::<CursorTimer>();
         }
     }
+}
+
+fn keyboard_input(
+    mut commands: Commands,
+    mut events: EventReader<KeyboardInput>,
+    edit_text: Single<(&mut Text, &CursorTimer, &TextField, Entity)>,
+) {
+    let (mut text, cursor_timer, text_field, entity) = edit_text.into_inner();
+    for event in events.read() {
+        // Only trigger changes when the key is first pressed.
+        if !event.state.is_pressed() {
+            continue;
+        }
+        println!(
+            "KB: {:?}, {:?} for {}",
+            &event.logical_key, &event.text, text.0
+        );
+
+        match (&event.logical_key, &event.text) {
+            (Key::Enter, _) => {
+                commands.entity(entity).remove::<CursorTimer>();
+            }
+            (Key::Backspace, _) => {
+                text.0.pop();
+            }
+            (_, Some(inserted_text)) => {
+                if inserted_text.chars().all(is_printable_char) {
+                    text.push_str(inserted_text);
+                }
+            }
+            _ => continue,
+        }
+    }
+}
+
+// this logic is taken from egui-winit:
+// https://github.com/emilk/egui/blob/adfc0bebfc6be14cee2068dee758412a5e0648dc/crates/egui-winit/src/lib.rs#L1014-L1024
+fn is_printable_char(chr: char) -> bool {
+    let is_in_private_use_area = ('\u{e000}'..='\u{f8ff}').contains(&chr)
+        || ('\u{f0000}'..='\u{ffffd}').contains(&chr)
+        || ('\u{100000}'..='\u{10fffd}').contains(&chr);
+
+    !is_in_private_use_area && !chr.is_ascii_control()
 }

@@ -49,7 +49,7 @@ impl BoxBuilder {
         self
     }
 
-    pub fn full_box(mut self) -> Self {
+    pub fn full_box(self) -> Self {
         self.width(Val::Percent(100.0))
             .height(Val::Percent(100.0))
             .border_color(RED.into())

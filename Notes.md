@@ -25,4 +25,4 @@ We used plugins for modularity, such as `TextFieldPlugin` in `text_field.rs`.
 
 ## Keyboard handling
 
-See 
+See https://github.com/bevyengine/bevy/blob/main/examples/input/text_input.rs

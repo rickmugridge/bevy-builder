@@ -7,7 +7,13 @@ use bevy::ui::ContentSize;
 #[require(Interaction)]
 pub struct TextField {
     id: String,
-    pub cursor_on:bool
+    pub cursor_on:bool,
+    pub cursor_position:u32,
+}
+
+pub enum CursorState {
+    Active(u32),
+    Inactive,
 }
 
 pub struct TextFieldBuilder {
