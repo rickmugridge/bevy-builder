@@ -1,10 +1,10 @@
-use crate::{ButtonNameChange, DESTINATION_BUTTON};
 use crate::builder::box_builder::BoxBuilder;
 use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
 use crate::builder::text_field_builder::TextFieldBuilder;
 use bevy::asset::AssetServer;
 use bevy::prelude::*;
+use crate::ui_plugin::button_edit::{ButtonNameChange, DESTINATION_BUTTON};
 
 pub fn setup_edit_panel(commands: &mut Commands, _asset_server: &Res<AssetServer>) -> Entity {
     // let font = asset_server.load("fonts/FiraSans-Bold.ttf");

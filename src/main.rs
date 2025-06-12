@@ -10,8 +10,7 @@ use crate::edit_panel::setup_edit_panel;
 use crate::ui_plugin::button::ButtonPlugin;
 use crate::ui_plugin::text_field::TextFieldPlugin;
 use bevy::prelude::*;
-
-const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
+use crate::ui_plugin::button_edit::ButtonEditPlugin;
 
 fn main() {
     App::new()
@@ -23,10 +22,9 @@ fn main() {
             }),
             ..default()
         }))
-        .add_plugins((TextFieldPlugin, ButtonPlugin))
+        .add_plugins((TextFieldPlugin, ButtonPlugin, ButtonEditPlugin))
         .insert_resource(ClearColor(Color::srgb(0.05, 0.15, 0.25)))
         .add_systems(Startup, setup_panels)
-        .add_event::<ButtonNameChange>()
         .run();
 }
 
@@ -46,11 +44,3 @@ fn setup_panels(mut commands: Commands, _asset_server: Res<AssetServer>) {
         .entity(container)
         .add_children(&[edit_panel, display_panel]);
 }
-
-#[derive(Event, Debug)]
-struct ButtonNameChange {
-    destination_id: String,
-    name: String,
-}
-
-const DESTINATION_BUTTON: &str = "destination";

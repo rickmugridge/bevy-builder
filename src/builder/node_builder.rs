@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::prelude::Val::Px;
 
 pub struct NodeBuilder {
     node: Node,
@@ -28,21 +29,31 @@ impl NodeBuilder {
         self.node.grid_template_columns = grid_template_columns;
         self
     }
+    
+    pub fn key_value_pairs(mut self) -> Self {
+        self.node.display = Display::Grid;
+        self.node.grid_template_columns = vec![RepeatedGridTrack::flex(1, 1.0)];
+        self.node.border = UiRect::all(Px(1.));
+        self
+    }
 
-    // Display
     pub fn display(mut self, display: Display) -> Self {
         self.node.display = display;
         self
     }
 
-    // Overflow
     pub fn overflow(mut self, overflow: Overflow) -> Self {
         self.node.overflow = overflow;
         self
     }
 
-    // Size
-    pub fn width(mut self, width: Val) -> Self {
+    pub fn size(mut self, width: Val, height: Val) -> Self {
+        self.node.width = width;
+        self.node.height = height;
+        self
+    }
+    
+   pub fn width(mut self, width: Val) -> Self {
         self.node.width = width;
         self
     }

@@ -104,9 +104,17 @@ fn keyboard_input(
                 }
             }
             (Key::ArrowLeft, _) => {
+                if text_field.cursor_on {
+                    text.remove(text_field.cursor_position);
+                    text.insert(text_field.cursor_position - 1, '|');
+                }
                 text_field.cursor_position -= 1;
             }
             (Key::ArrowRight, _) => {
+                if text_field.cursor_on {
+                    text.remove(text_field.cursor_position);
+                    text.insert(text_field.cursor_position + 1, '|');
+                }
                 text_field.cursor_position += 1;
             }
             (_, Some(inserted_text)) => {
