@@ -8,8 +8,8 @@ use bevy::color::palettes::basic::{BLUE, GREEN, RED};
 use bevy::prelude::*;
 
 #[derive(Component, Debug)]
-struct ButtonBorderColoration {
-    id_destination: String,
+pub struct ButtonBorderColoration {
+    pub destination_id: String,
 }
 
 pub fn setup_button_edit_panel(
@@ -36,18 +36,16 @@ pub fn setup_button_edit_panel(
     let text = setup_text_edit_panel(commands, "Default", DESTINATION_BUTTON);
     let background_label = make_text(commands, "Border colour:");
     let rgb_entity = commands
-        .spawn(
-            (ButtonBorderColoration {
-                id_destination: "XXX".to_string(),
-            }),
-        )
-        .id(); // todo Use ButtonBorderColoration marker to update that button.
-    let background_color = setup_border_edit_panel(commands, rgb_entity);
+        .spawn(ButtonBorderColoration {
+            destination_id: DESTINATION_BUTTON.to_string(),
+        })
+        .id();
+    let background_color_edit = setup_border_edit_panel(commands, rgb_entity);
     commands.entity(key_values_panel).add_children(&[
         label_text,
         text,
         background_label,
-        background_color,
+        background_color_edit,
     ]);
     commands
         .entity(row_container)

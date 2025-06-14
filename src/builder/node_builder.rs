@@ -51,8 +51,8 @@ impl NodeBuilder {
         self.border_color = BorderColor::from(WHITE);
         self.border_color = BorderColor::from(WHITE);
         self.node.margin = UiRect::all(Val::Px(5.0));
-        self.background_color=WHITE.into();
-         self
+        self.background_color = WHITE.into();
+        self
     }
 
     pub fn display(mut self, display: Display) -> Self {

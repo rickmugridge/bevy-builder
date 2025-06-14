@@ -112,9 +112,9 @@ fn tick_cursor(mut cursor_timer: Query<(&mut Text, &mut CursorTimer)>, time: Res
 fn keyboard_input(
     mut commands: Commands,
     mut events: EventReader<KeyboardInput>,
-    edit_text: Single<(&mut Text, &mut TextField, &mut CursorTimer, Entity)>,
+    edit_text: Single<(&mut Text, &TextField, &mut CursorTimer, Entity)>,
 ) {
-    let (mut text, mut text_field, mut cursor, entity) = edit_text.into_inner();
+    let (mut text, text_field, mut cursor, entity) = edit_text.into_inner();
     for event in events.read() {
         // Only trigger changes when the key is first pressed.
         if !event.state.is_pressed() {

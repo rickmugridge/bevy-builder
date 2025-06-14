@@ -11,6 +11,7 @@ use edit::edit_panel::setup_edit_panel;
 use crate::ui_plugin::button::ButtonPlugin;
 use crate::ui_plugin::text_field::TextFieldPlugin;
 use bevy::prelude::*;
+use crate::edit::color_sample::ColorSamplePlugin;
 use crate::ui_plugin::button_edit::ButtonEditPlugin;
 
 fn main() {
@@ -23,7 +24,7 @@ fn main() {
             }),
             ..default()
         }))
-        .add_plugins((TextFieldPlugin, ButtonPlugin, ButtonEditPlugin))
+        .add_plugins((TextFieldPlugin, ButtonPlugin, ButtonEditPlugin, ColorSamplePlugin))
         .insert_resource(ClearColor(Color::srgb(0.05, 0.15, 0.25)))
         .add_systems(Startup, setup_panels)
         .run();
