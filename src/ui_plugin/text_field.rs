@@ -13,22 +13,30 @@ impl Plugin for TextFieldPlugin {
 }
 
 #[derive(Component, Debug)]
-struct CursorTimer(Timer);
+struct CursorTimer {
+    timer: Timer,
+    on: bool,
+    position: usize,
+}
 
 impl CursorTimer {
-    pub fn new() -> Self {
-        Self(Timer::from_seconds(0.5, TimerMode::Repeating))
+    pub fn new(position: usize) -> Self {
+        Self {
+            timer: Timer::from_seconds(0.5, TimerMode::Repeating),
+            on: false,
+            position,
+        }
     }
 }
 
 fn mouse_handling(
     mut commands: Commands,
     mut interaction_query: Query<
-        (&Interaction, &mut BackgroundColor, Entity, &mut TextField),
+        (&Interaction, &Text, &mut BackgroundColor, Entity),
         (Changed<Interaction>, With<TextField>),
     >,
 ) {
-    for (interaction, mut background_color, entity, mut text_field) in interaction_query.iter_mut()
+    for (interaction, text, mut background_color, entity) in interaction_query.iter_mut()
     {
         // println!(
         //     "Button over TextField {:?} {:?}",
@@ -37,35 +45,33 @@ fn mouse_handling(
         match *interaction {
             Interaction::Pressed => {
                 background_color.0 = RED.into();
-                commands.entity(entity).insert(CursorTimer::new()); // also signals it is selected
-                text_field.cursor_on = false;
+                commands.entity(entity).insert(CursorTimer::new(text.0.len())); // also signals it is selected
             }
             Interaction::Hovered => {
                 background_color.0 = GREEN.into();
             }
             Interaction::None => {
                 background_color.0 = Color::WHITE;
-                // todo set this as not selected??
             }
         }
     }
 }
 
 fn tick_cursor(
-    mut cursor_timer: Query<(&mut Text, &mut TextField, &mut CursorTimer)>,
+    mut cursor_timer: Query<(&mut Text, &mut CursorTimer)>,
     time: Res<Time>,
 ) {
-    for (mut text, mut text_field, mut cooldown) in &mut cursor_timer {
-        cooldown.0.tick(time.delta());
-        if cooldown.0.finished() {
-            cooldown.0.reset();
-            // println!("Ticking cursor on {} at {}", text.0, text_field.cursor_position);
-            if text_field.cursor_on {
-                text.remove(text_field.cursor_position);
-                text_field.cursor_on = false;
+    for (mut text, mut cursor) in &mut cursor_timer {
+        cursor.timer.tick(time.delta());
+        if cursor.timer.finished() {
+            cursor.timer.reset();
+            // println!("Ticking cursor on {} at {}", text.0, cursor.position);
+            if cursor.on {
+                text.remove(cursor.position);
+                cursor.on = false;
             } else {
-                text.0.insert(text_field.cursor_position, '|');
-                text_field.cursor_on = true;
+                text.0.insert(cursor.position, '|');
+                cursor.on = true;
             }
         }
     }
@@ -74,10 +80,10 @@ fn tick_cursor(
 fn keyboard_input(
     mut commands: Commands,
     mut events: EventReader<KeyboardInput>,
-    edit_text: Single<(&mut Text, &mut TextField, Entity), With<CursorTimer>>,
+    edit_text: Single<(&mut Text, &mut TextField, &mut CursorTimer, Entity)>,
 ) {
     println!("Keyboard input");
-    let (mut text, mut text_field, entity) = edit_text.into_inner();
+    let (mut text, mut text_field, mut cursor, entity) = edit_text.into_inner();
     for event in events.read() {
         // Only trigger changes when the key is first pressed.
         if !event.state.is_pressed() {
@@ -91,39 +97,39 @@ fn keyboard_input(
         match (&event.logical_key, &event.text) {
             (Key::Enter, _) => {
                 commands.entity(entity).remove::<CursorTimer>();
-                if text_field.cursor_on {
-                    text.remove(text_field.cursor_position);
-                    text_field.cursor_on = false;
+                if cursor.on {
+                    text.remove(cursor.position);
+                    cursor.on = false;
                 }
             }
             (Key::Backspace, _) => {
-                text.remove(text_field.cursor_position - 1);
-                text_field.cursor_position -= 1;
+                text.remove(cursor.position - 1);
+                cursor.position -= 1;
                 if let Some(on_change) = &text_field.on_change {
-                    let text = text_without_cursor(text.0.clone(), &text_field);
+                    let text = text_without_cursor(text.0.clone(), &cursor);
                     on_change(text, &mut commands);
                 }
             }
-            (Key::ArrowLeft, _) if text_field.cursor_position > 0 => {
-                if text_field.cursor_on {
-                    text.remove(text_field.cursor_position);
-                    text.insert(text_field.cursor_position - 1, '|');
+            (Key::ArrowLeft, _) if cursor.position > 0 => {
+                if cursor.on {
+                    text.remove(cursor.position);
+                    text.insert(cursor.position - 1, '|');
                 }
-                text_field.cursor_position -= 1;
+                cursor.position -= 1;
             }
-            (Key::ArrowRight, _) if text_field.cursor_position < text.0.len() => {
-                if text_field.cursor_on {
-                    text.remove(text_field.cursor_position);
-                    text.insert(text_field.cursor_position + 1, '|');
+            (Key::ArrowRight, _) if cursor.position < text.0.len() => {
+                if cursor.on {
+                    text.remove(cursor.position);
+                    text.insert(cursor.position + 1, '|');
                 }
-                text_field.cursor_position += 1;
+                cursor.position += 1;
             }
             (_, Some(inserted_text)) => {
                 if inserted_text.chars().all(is_printable_char) {
-                    text.insert_str(text_field.cursor_position, inserted_text);
-                    text_field.cursor_position += 1;
+                    text.insert_str(cursor.position, inserted_text);
+                    cursor.position += 1;
                     if let Some(on_change) = &text_field.on_change {
-                        let text = text_without_cursor(text.0.clone(), &text_field);
+                        let text = text_without_cursor(text.0.clone(), &cursor);
                         on_change(text, &mut commands);
                     }
                 }
@@ -132,9 +138,9 @@ fn keyboard_input(
         }
     }
 
-    fn text_without_cursor(mut text: String, text_field: &TextField) -> String {
-        if text_field.cursor_on {
-            text.remove(text_field.cursor_position);
+    fn text_without_cursor(mut text: String, cursor:&CursorTimer) -> String {
+        if cursor.on {
+            text.remove(cursor.position);
         }
         text
     }

@@ -9,8 +9,6 @@ use std::sync::Arc;
 #[require(Interaction)]
 pub struct TextField {
     pub id: String,
-    pub cursor_on: bool,
-    pub cursor_position: usize,
     pub on_change: Option<TextChangeCallback>,
 }
 
@@ -98,8 +96,7 @@ impl TextFieldBuilder {
         self
     }
 
-    pub fn build_and_spawn(mut self, commands: &mut Commands) -> Entity {
-        self.text_field.cursor_position = self.content.len();
+    pub fn build_and_spawn(self, commands: &mut Commands) -> Entity {
         let text = (
             Text::new(self.content),
             self.text_field,
