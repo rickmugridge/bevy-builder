@@ -1,7 +1,8 @@
-use crate::builder::box_builder::BoxBuilder;
+use crate::builder::node_builder::NodeBuilder;
+use bevy::color::palettes::basic::TEAL;
 use bevy::prelude::*;
-use bevy::ui::ContentSize;
 use bevy::ui::widget::TextNodeFlags;
+use bevy::ui::ContentSize;
 use std::sync::Arc;
 
 #[derive(Component, Default)]
@@ -115,9 +116,9 @@ impl TextFieldBuilder {
             BackgroundColor(Color::WHITE), // This has no impact because text_field_hover() sets it as WHITE on first, auto, Update
             self.node,
         );
-        let border_node = BoxBuilder::new()
-            .border_color(Color::WHITE)
-            .border_of(Val::Px(1.))
+        let border_node = NodeBuilder::new()
+            .border_of(Val::Px(1.), TEAL.into())
+            .background_color(Color::WHITE)
             .build_and_spawn(commands);
         let text_entity = commands.spawn(text).id();
         commands.entity(border_node).add_child(text_entity);

@@ -3,6 +3,7 @@ use crate::builder::button_builder::ButtonBuilder;
 use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
 use bevy::asset::AssetServer;
+use bevy::color::palettes::basic::PURPLE;
 use bevy::prelude::*;
 use crate::ui_plugin::button::NORMAL;
 use crate::ui_plugin::button_edit::DESTINATION_BUTTON;
@@ -16,7 +17,7 @@ pub fn setup_display_panel(commands: &mut Commands, _asset_server: &Res<AssetSer
             .height(Val::Px(65.0))
             .justify_content(JustifyContent::Center)
             .align_items(AlignItems::Center)
-            .border(UiRect::all(Val::Px(5.0)))
+            .border(UiRect::all(Val::Px(5.0)), PURPLE.into())
             .build(),
         TextBuilder::new().build_and_spawn(commands),
     )

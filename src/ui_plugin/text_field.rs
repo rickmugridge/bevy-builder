@@ -74,8 +74,9 @@ fn tick_cursor(
 fn keyboard_input(
     mut commands: Commands,
     mut events: EventReader<KeyboardInput>,
-    edit_text: Single<(&mut Text, &mut TextField, Entity)>,
+    edit_text: Single<(&mut Text, &mut TextField, Entity), With<CursorTimer>>,
 ) {
+    println!("Keyboard input");
     let (mut text, mut text_field, entity) = edit_text.into_inner();
     for event in events.read() {
         // Only trigger changes when the key is first pressed.
@@ -103,14 +104,14 @@ fn keyboard_input(
                     on_change(text, &mut commands);
                 }
             }
-            (Key::ArrowLeft, _) => {
+            (Key::ArrowLeft, _) if text_field.cursor_position > 0 => {
                 if text_field.cursor_on {
                     text.remove(text_field.cursor_position);
                     text.insert(text_field.cursor_position - 1, '|');
                 }
                 text_field.cursor_position -= 1;
             }
-            (Key::ArrowRight, _) => {
+            (Key::ArrowRight, _) if text_field.cursor_position < text.0.len() => {
                 if text_field.cursor_on {
                     text.remove(text_field.cursor_position);
                     text.insert(text_field.cursor_position + 1, '|');

@@ -1,14 +1,19 @@
-use bevy::prelude::*;
+use bevy::color::palettes::css::WHITE;
 use bevy::prelude::Val::Px;
+use bevy::prelude::*;
 
 pub struct NodeBuilder {
     node: Node,
+    border_color: BorderColor,
+    background_color: BackgroundColor,
 }
 
 impl Default for NodeBuilder {
     fn default() -> Self {
         Self {
             node: Node::default(),
+            border_color: BorderColor::default(),
+            background_color: BackgroundColor::default(),
         }
     }
 }
@@ -29,11 +34,15 @@ impl NodeBuilder {
         self.node.grid_template_columns = grid_template_columns;
         self
     }
-    
+
     pub fn key_value_pairs(mut self) -> Self {
         self.node.display = Display::Grid;
-        self.node.grid_template_columns = vec![RepeatedGridTrack::flex(1, 1.0)];
+        self.node.grid_template_columns = vec![GridTrack::flex(1.0), GridTrack::flex(1.0)];
         self.node.border = UiRect::all(Px(1.));
+        self.border_color = BorderColor::from(WHITE);
+        self.node.align_items = AlignItems::Stretch; // todo these don't help in layout on change
+        self.node.justify_items = JustifyItems::Stretch;
+        self.node.justify_content = JustifyContent::Stretch;
         self
     }
 
@@ -52,8 +61,8 @@ impl NodeBuilder {
         self.node.height = height;
         self
     }
-    
-   pub fn width(mut self, width: Val) -> Self {
+
+    pub fn width(mut self, width: Val) -> Self {
         self.node.width = width;
         self
     }
@@ -83,8 +92,25 @@ impl NodeBuilder {
         self
     }
 
-    pub fn border(mut self, border: UiRect) -> Self {
+    pub fn border(mut self, border: UiRect, border_color: Color) -> Self {
         self.node.border = border;
+        self.border_color = BorderColor::from(border_color);
+        self
+    }
+
+    pub fn border_of(mut self, val: Val, border_color: Color) -> Self {
+        self.node.border = UiRect::all(val);
+        self.border_color = BorderColor::from(border_color);
+        self
+    }
+
+    pub fn border_color(mut self, border_color: Color) -> Self {
+        self.border_color = BorderColor::from(border_color);
+        self
+    }
+
+    pub fn background_color(mut self, background_color: Color) -> Self {
+        self.background_color = BackgroundColor::from(background_color);
         self
     }
 
@@ -204,6 +230,8 @@ impl NodeBuilder {
     }
 
     pub fn build_and_spawn(self, commands: &mut Commands) -> Entity {
-        commands.spawn(self.build()).id()
+        commands
+            .spawn((self.node, self.border_color, self.background_color))
+            .id()
     }
 }

@@ -10,7 +10,7 @@ pub struct ButtonPlugin;
 impl Plugin for ButtonPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_systems(Update, (button_hover));
+            .add_systems(Update, button_hover);
     }
 }
 
