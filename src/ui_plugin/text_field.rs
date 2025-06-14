@@ -33,7 +33,7 @@ fn mouse_handling(
     mut commands: Commands,
     mut interaction_query: Query<
         (&Interaction, &mut Text, &mut BackgroundColor, Entity),
-        (Changed<Interaction>, With<TextField>),
+        (Changed<Interaction>, With<TextField>, Without<CursorTimer>),
     >,
 ) {
     for (interaction, mut text, mut background_color, entity) in interaction_query.iter_mut() {
@@ -82,7 +82,6 @@ fn keyboard_input(
     mut events: EventReader<KeyboardInput>,
     edit_text: Single<(&mut Text, &mut TextField, &mut CursorTimer, Entity)>,
 ) {
-    println!("Keyboard input");
     let (mut text, mut text_field, mut cursor, entity) = edit_text.into_inner();
     for event in events.read() {
         // Only trigger changes when the key is first pressed.

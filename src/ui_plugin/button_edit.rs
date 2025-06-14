@@ -16,7 +16,6 @@ fn react_to_content_update(
     mut events: EventReader<ButtonNameChange>,
     mut text_query: Query<&mut Text>,
 ) {
-    println!("react_to_content_update");
     for (button_id, children) in button_query.iter_mut() {
         for ButtonNameChange {
             destination_id,
