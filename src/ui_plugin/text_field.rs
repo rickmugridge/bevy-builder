@@ -32,12 +32,11 @@ impl CursorTimer {
 fn mouse_handling(
     mut commands: Commands,
     mut interaction_query: Query<
-        (&Interaction, &Text, &mut BackgroundColor, Entity),
+        (&Interaction, &mut Text, &mut BackgroundColor, Entity),
         (Changed<Interaction>, With<TextField>),
     >,
 ) {
-    for (interaction, text, mut background_color, entity) in interaction_query.iter_mut()
-    {
+    for (interaction, mut text, mut background_color, entity) in interaction_query.iter_mut() {
         // println!(
         //     "Button over TextField {:?} {:?}",
         //     interaction, background_color
@@ -45,7 +44,9 @@ fn mouse_handling(
         match *interaction {
             Interaction::Pressed => {
                 background_color.0 = RED.into();
-                commands.entity(entity).insert(CursorTimer::new(text.0.len())); // also signals it is selected
+                let length = text.0.len();
+                text.0.insert(length, '_');
+                commands.entity(entity).insert(CursorTimer::new(length)); // also signals it is selected
             }
             Interaction::Hovered => {
                 background_color.0 = GREEN.into();
@@ -57,10 +58,7 @@ fn mouse_handling(
     }
 }
 
-fn tick_cursor(
-    mut cursor_timer: Query<(&mut Text, &mut CursorTimer)>,
-    time: Res<Time>,
-) {
+fn tick_cursor(mut cursor_timer: Query<(&mut Text, &mut CursorTimer)>, time: Res<Time>) {
     for (mut text, mut cursor) in &mut cursor_timer {
         cursor.timer.tick(time.delta());
         if cursor.timer.finished() {
@@ -68,8 +66,10 @@ fn tick_cursor(
             // println!("Ticking cursor on {} at {}", text.0, cursor.position);
             if cursor.on {
                 text.remove(cursor.position);
+                text.0.insert(cursor.position, '_');
                 cursor.on = false;
             } else {
+                text.remove(cursor.position);
                 text.0.insert(cursor.position, '|');
                 cursor.on = true;
             }
@@ -96,11 +96,8 @@ fn keyboard_input(
 
         match (&event.logical_key, &event.text) {
             (Key::Enter, _) => {
+                text.remove(cursor.position);
                 commands.entity(entity).remove::<CursorTimer>();
-                if cursor.on {
-                    text.remove(cursor.position);
-                    cursor.on = false;
-                }
             }
             (Key::Backspace, _) => {
                 text.remove(cursor.position - 1);
@@ -111,17 +108,13 @@ fn keyboard_input(
                 }
             }
             (Key::ArrowLeft, _) if cursor.position > 0 => {
-                if cursor.on {
-                    text.remove(cursor.position);
-                    text.insert(cursor.position - 1, '|');
-                }
+                text.remove(cursor.position);
+                text.insert(cursor.position - 1, '|');
                 cursor.position -= 1;
             }
             (Key::ArrowRight, _) if cursor.position < text.0.len() => {
-                if cursor.on {
-                    text.remove(cursor.position);
-                    text.insert(cursor.position + 1, '|');
-                }
+                text.remove(cursor.position);
+                text.insert(cursor.position + 1, '|');
                 cursor.position += 1;
             }
             (_, Some(inserted_text)) => {
@@ -138,10 +131,8 @@ fn keyboard_input(
         }
     }
 
-    fn text_without_cursor(mut text: String, cursor:&CursorTimer) -> String {
-        if cursor.on {
-            text.remove(cursor.position);
-        }
+    fn text_without_cursor(mut text: String, cursor: &CursorTimer) -> String {
+        text.remove(cursor.position);
         text
     }
 }
