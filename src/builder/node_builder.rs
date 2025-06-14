@@ -46,6 +46,15 @@ impl NodeBuilder {
         self
     }
 
+    pub fn text_field_node(mut self) -> Self {
+        self.node.border = UiRect::all(Px(5.));
+        self.border_color = BorderColor::from(WHITE);
+        self.border_color = BorderColor::from(WHITE);
+        self.node.margin = UiRect::all(Val::Px(5.0));
+        self.background_color=WHITE.into();
+         self
+    }
+
     pub fn display(mut self, display: Display) -> Self {
         self.node.display = display;
         self

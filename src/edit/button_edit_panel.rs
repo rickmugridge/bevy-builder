@@ -1,10 +1,16 @@
 use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
 use crate::builder::text_field_builder::TextFieldBuilder;
+use crate::edit::colour_panel::setup_border_edit_panel;
 use crate::ui_plugin::button_edit::{ButtonNameChange, DESTINATION_BUTTON};
 use bevy::asset::AssetServer;
-use bevy::color::palettes::basic::{BLUE, GREEN, RED, WHITE};
+use bevy::color::palettes::basic::{BLUE, GREEN, RED};
 use bevy::prelude::*;
+
+#[derive(Component, Debug)]
+struct ButtonBorderColoration {
+    id_destination: String,
+}
 
 pub fn setup_button_edit_panel(
     commands: &mut Commands,
@@ -29,7 +35,14 @@ pub fn setup_button_edit_panel(
     let label_text = make_text(commands, "Text:");
     let text = setup_text_edit_panel(commands, "Default", DESTINATION_BUTTON);
     let background_label = make_text(commands, "Border colour:");
-    let background_color = setup_background_edit_panel(commands);
+    let rgb_entity = commands
+        .spawn(
+            (ButtonBorderColoration {
+                id_destination: "XXX".to_string(),
+            }),
+        )
+        .id(); // todo Use ButtonBorderColoration marker to update that button.
+    let background_color = setup_border_edit_panel(commands, rgb_entity);
     commands.entity(key_values_panel).add_children(&[
         label_text,
         text,
@@ -48,13 +61,7 @@ fn setup_text_edit_panel<S: Into<String>>(
     destination_id: &'static str,
 ) -> Entity {
     TextFieldBuilder::new()
-        .node(
-            NodeBuilder::new()
-                .border(UiRect::all(Val::Px(5.0)), WHITE.into())
-                .margin(UiRect::all(Val::Px(5.0)))
-                .background_color(WHITE.into())
-                .build(),
-        )
+        .node(NodeBuilder::new().text_field_node().build())
         .on_change(|button_text, commands| {
             commands.queue(|w: &mut World| {
                 println!(
@@ -71,24 +78,6 @@ fn setup_text_edit_panel<S: Into<String>>(
         .content(default_content)
         // .on_change(|id, s, commands| println!("on_change of {}: {}", id, s))
         .build_and_spawn(commands)
-}
-
-fn setup_background_edit_panel(commands: &mut Commands) -> Entity {
-    let key_values_panel = NodeBuilder::new()
-        .key_value_pairs()
-        .background_color(GREEN.into())
-        .build_and_spawn(commands);
-    let red_label = make_text(commands, "Red:");
-    let red = setup_text_edit_panel(commands, "0.0", "DesignationRed");
-    let green_label = make_text(commands, "Green:");
-    let green = setup_text_edit_panel(commands, "0.0", "DesignationGreen");
-    let blue_label = make_text(commands, "Blue:");
-    let blue = setup_text_edit_panel(commands, "0.0", "DesignationBlue");
-    commands
-        .entity(key_values_panel)
-        // .add_children(&[red_label, green_label, blue_label]);
-        .add_children(&[red_label, red, green_label, green, blue_label, blue]);
-    key_values_panel
 }
 
 fn make_text(commands: &mut Commands, s: &str) -> Entity {
