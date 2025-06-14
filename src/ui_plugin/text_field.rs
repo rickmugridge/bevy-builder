@@ -8,7 +8,16 @@ pub struct TextFieldPlugin;
 
 impl Plugin for TextFieldPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (mouse_handling, tick_cursor, keyboard_input));
+        app.add_systems(
+            Update,
+            (
+                react_to_deselect,
+                mouse_handling,
+                tick_cursor,
+                keyboard_input,
+            ),
+        )
+        .add_event::<TextFieldDeselected>();
     }
 }
 
@@ -25,6 +34,26 @@ impl CursorTimer {
             timer: Timer::from_seconds(0.5, TimerMode::Repeating),
             on: false,
             position,
+        }
+    }
+}
+
+#[derive(Event, Debug)]
+pub struct TextFieldDeselected {
+    pub current_id: Entity,
+}
+
+fn react_to_deselect(
+    mut commands: Commands,
+    mut cursor_query: Query<(Entity, &mut Text, &CursorTimer)>,
+    mut events: EventReader<TextFieldDeselected>,
+) {
+    for (entity,mut text, cursor) in cursor_query.iter_mut() {
+        for TextFieldDeselected { current_id } in events.read() {
+            if *current_id != entity {
+                text.remove(cursor.position);
+                commands.entity(entity).remove::<CursorTimer>();
+            }
         }
     }
 }
@@ -47,6 +76,9 @@ fn mouse_handling(
                 let length = text.0.len();
                 text.0.insert(length, '_');
                 commands.entity(entity).insert(CursorTimer::new(length)); // also signals it is selected
+                commands.queue(move |w: &mut World| {
+                    w.send_event(TextFieldDeselected { current_id: entity });
+                })
             }
             Interaction::Hovered => {
                 background_color.0 = GREEN.into();

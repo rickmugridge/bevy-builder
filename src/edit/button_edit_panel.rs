@@ -28,7 +28,7 @@ pub fn setup_button_edit_panel(
         .build_and_spawn(commands);
     let label_text = make_text(commands, "Text:");
     let text = setup_text_edit_panel(commands, "Default", DESTINATION_BUTTON);
-    let background_label = make_text(commands, "Background colour:");
+    let background_label = make_text(commands, "Border colour:");
     let background_color = setup_background_edit_panel(commands);
     commands.entity(key_values_panel).add_children(&[
         label_text,
