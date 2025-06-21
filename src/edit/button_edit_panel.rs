@@ -1,11 +1,14 @@
 use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
 use crate::builder::text_field_builder::TextFieldBuilder;
-use crate::edit::colour_panel::setup_border_edit_panel;
-use crate::ui_plugin::button_edit::{ButtonNameChange, DESTINATION_BUTTON};
+use crate::edit::colour_panel::setup_colour_edit_panel;
+use crate::ui_plugin::button_edit_plugin::{ButtonNameChange, DESTINATION_BUTTON};
 use bevy::asset::AssetServer;
 use bevy::color::palettes::basic::{BLUE, GREEN, RED};
 use bevy::prelude::*;
+
+pub const TO_BUTTON_BACKGROUND_COLOR_OPEN_CLOSE: &str = "TO_BUTTON_BACKGROUND_COLOR_OPEN_CLOSE";
+pub const TO_BUTTON_BACKGROUND_COLOR_HOVER: &str = "TO_BUTTON_BACKGROUND_COLOR_HOVER";
 
 #[derive(Component, Debug)]
 pub struct ButtonBorderColoration {
@@ -16,6 +19,25 @@ pub fn setup_button_edit_panel(
     commands: &mut Commands,
     _asset_server: &Res<AssetServer>,
 ) -> Entity {
+
+    let top_label = make_text(commands, "Edit Button:");
+    let key_values_panel = NodeBuilder::new()
+        .key_value_pairs()
+        .background_color(GREEN.into())
+        .build_and_spawn(commands);
+    let label_text = make_text(commands, "Text:");
+    let text = setup_text_edit_panel(commands, "Default", DESTINATION_BUTTON);
+    let background_label = make_text(commands, "Border colour:");
+    let background_color_edit = setup_colour_edit_panel(commands,
+                                                        DESTINATION_BUTTON.to_string(),
+                                                        TO_BUTTON_BACKGROUND_COLOR_OPEN_CLOSE.to_string());
+    commands.entity(key_values_panel).add_children(&[
+        label_text,
+        text,
+        background_label,
+        background_color_edit,
+    ]);
+    
     let row_container = NodeBuilder::new()
         .width(Val::Percent(100.0))
         .height(Val::Percent(100.0))
@@ -26,27 +48,6 @@ pub fn setup_button_edit_panel(
         .border(UiRect::all(Val::Px(5.0)), RED.into())
         .background_color(BLUE.into())
         .build_and_spawn(commands);
-
-    let top_label = make_text(commands, "Edit Button:");
-    let key_values_panel = NodeBuilder::new()
-        .key_value_pairs()
-        .background_color(GREEN.into())
-        .build_and_spawn(commands);
-    let label_text = make_text(commands, "Text:");
-    let text = setup_text_edit_panel(commands, "Default", DESTINATION_BUTTON);
-    let background_label = make_text(commands, "Border colour:");
-    let rgb_entity = commands
-        .spawn(ButtonBorderColoration {
-            destination_id: DESTINATION_BUTTON.to_string(),
-        })
-        .id();
-    let background_color_edit = setup_border_edit_panel(commands, rgb_entity);
-    commands.entity(key_values_panel).add_children(&[
-        label_text,
-        text,
-        background_label,
-        background_color_edit,
-    ]);
     commands
         .entity(row_container)
         .add_children(&[top_label, key_values_panel]);

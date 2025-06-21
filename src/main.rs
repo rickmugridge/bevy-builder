@@ -3,16 +3,15 @@ mod display_panel;
 mod ui_plugin;
 mod edit;
 
-use std::string::ToString;
-use bevy::color::palettes::basic::SILVER;
 use crate::builder::node_builder::NodeBuilder;
 use crate::display_panel::setup_display_panel;
-use edit::edit_panel::setup_edit_panel;
-use crate::ui_plugin::button::ButtonPlugin;
-use crate::ui_plugin::text_field::TextFieldPlugin;
+use crate::ui_plugin::button_plugin::ButtonPlugin;
+use crate::ui_plugin::edit_plugin::EditPlugin;
+use crate::ui_plugin::text_field_plugin::TextFieldPlugin;
+use bevy::color::palettes::basic::SILVER;
 use bevy::prelude::*;
-use crate::edit::color_sample::ColorSamplePlugin;
-use crate::ui_plugin::button_edit::ButtonEditPlugin;
+use edit::edit_panel::setup_edit_panel;
+use std::string::ToString;
 
 fn main() {
     App::new()
@@ -24,7 +23,7 @@ fn main() {
             }),
             ..default()
         }))
-        .add_plugins((TextFieldPlugin, ButtonPlugin, ButtonEditPlugin, ColorSamplePlugin))
+        .add_plugins((TextFieldPlugin, ButtonPlugin, EditPlugin))
         .insert_resource(ClearColor(Color::srgb(0.05, 0.15, 0.25)))
         .add_systems(Startup, setup_panels)
         .run();

@@ -10,8 +10,11 @@ pub struct ButtonEditPlugin;
 
 impl Plugin for ButtonEditPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (react_to_content_update, react_to_border_colour_update))
-            .add_event::<ButtonNameChange>();
+        app.add_systems(
+            Update,
+            (react_to_content_update, react_to_border_colour_update),
+        )
+        .add_event::<ButtonNameChange>();
     }
 }
 
@@ -51,14 +54,15 @@ fn react_to_border_colour_update(
             EditBlue(blue),
         ) in coloration_query.iter()
         {
-             if *destination_id == button_id.0 {
-                  let new_color = Color::srgb(*red, *green, *blue);
-                 if border_color.0 != new_color {
-                     println!(
-                         "Button border colour change for {destination_id}: ({red}, {green}, {blue})"
-                     );
-                     border_color.0 = new_color;
-                 }
+            if *destination_id == button_id.0 {
+                let new_color = Color::srgb(*red, *green, *blue);
+                if border_color.0 != new_color {
+                    println!(
+                        "Button border colour change for {destination_id} from {:?} to {:?}",
+                        border_color.0, new_color
+                    );
+                    border_color.0 = new_color;
+                }
             }
         }
     }

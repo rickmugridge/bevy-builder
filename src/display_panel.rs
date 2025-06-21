@@ -1,8 +1,8 @@
 use crate::builder::button_builder::ButtonBuilder;
 use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
-use crate::ui_plugin::button::NORMAL;
-use crate::ui_plugin::button_edit::DESTINATION_BUTTON;
+use crate::ui_plugin::button_plugin::NORMAL;
+use crate::ui_plugin::button_edit_plugin::DESTINATION_BUTTON;
 use bevy::asset::AssetServer;
 use bevy::color::palettes::basic::{PURPLE, YELLOW};
 use bevy::prelude::Val::Px;
