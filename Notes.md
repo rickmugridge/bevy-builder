@@ -27,6 +27,11 @@ See `text_field_builder.rs`:
 
 * An `Interaction` component is required by struct `TextField`, needed to pick up mouse events
 
+For a Component, such as `OpenClose`, that needs mouse interaction, include the following in the component declaration:
+ * `#[require(Interaction)]`
+
+To debounce a mouse Press, use a resource to track the timing of the last Press. See DebounceMousePress
+
 ## Plugins
 
 We used plugins for modularity, such as `TextFieldPlugin` in `text_field.rs`.

@@ -19,26 +19,7 @@ pub fn setup_button_edit_panel(
     commands: &mut Commands,
     _asset_server: &Res<AssetServer>,
 ) -> Entity {
-
-    let top_label = make_text(commands, "Edit Button:");
-    let key_values_panel = NodeBuilder::new()
-        .key_value_pairs()
-        .background_color(GREEN.into())
-        .build_and_spawn(commands);
-    let label_text = make_text(commands, "Text:");
-    let text = setup_text_edit_panel(commands, "Default", DESTINATION_BUTTON);
-    let background_label = make_text(commands, "Border colour:");
-    let background_color_edit = setup_colour_edit_panel(commands,
-                                                        DESTINATION_BUTTON.to_string(),
-                                                        TO_BUTTON_BACKGROUND_COLOR_OPEN_CLOSE.to_string());
-    commands.entity(key_values_panel).add_children(&[
-        label_text,
-        text,
-        background_label,
-        background_color_edit,
-    ]);
-    
-    let row_container = NodeBuilder::new()
+    let left_container = NodeBuilder::new()
         .width(Val::Percent(100.0))
         .height(Val::Percent(100.0))
         .align_items(AlignItems::Start)
@@ -48,10 +29,41 @@ pub fn setup_button_edit_panel(
         .border(UiRect::all(Val::Px(5.0)), RED.into())
         .background_color(BLUE.into())
         .build_and_spawn(commands);
+    let top_label = make_text(commands, "Edit Button:");
+    let key_values_panel = setup_key_value_panel(commands);
     commands
-        .entity(row_container)
+        .entity(left_container)
         .add_children(&[top_label, key_values_panel]);
-    row_container
+    left_container
+}
+
+fn setup_key_value_panel(commands: &mut Commands) -> Entity {
+    let key_values_panel = NodeBuilder::new()
+        .key_value_pairs()
+        .background_color(GREEN.into())
+        .build_and_spawn(commands);
+    let text = setup_text_edit_panel(commands, "Default", DESTINATION_BUTTON);
+    let background_color_edit = setup_colour_edit_panel(
+        commands,
+        DESTINATION_BUTTON.to_string(),
+        TO_BUTTON_BACKGROUND_COLOR_OPEN_CLOSE.to_string(),
+    );
+     let pairs = &[("Text:", text), ("Border colour:", background_color_edit)];
+    add_key_value_pairs(pairs, key_values_panel, commands);
+    key_values_panel
+}
+
+fn add_key_value_pairs(
+    pairs: &[(&str, Entity)],
+    key_values_panel: Entity,
+    commands: &mut Commands,
+) {
+    let mut children: Vec<Entity> = vec![];
+    pairs.iter().for_each(|(s, entity)| {
+        children.push(make_text(commands, s));
+        children.push(*entity);
+    });
+    commands.entity(key_values_panel).add_children(&children);
 }
 
 fn setup_text_edit_panel<S: Into<String>>(
