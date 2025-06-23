@@ -10,13 +10,13 @@ use bevy::prelude::{Commands, Component, Display, Entity, GridTrack, Interaction
 
 pub fn setup_colour_edit_panel(
     commands: &mut Commands,
-    colour_destination_id: String,
-    open_destination_id: String,
+    colour_source_id: String,
+    open_source_id: String,
 ) -> Entity {
     let rgb_entity = commands
         .spawn((
             ButtonBorderColoration {
-                destination_id: colour_destination_id.clone(),
+                source_id: colour_source_id.clone(),
             },
             EditRed(0.0),
             EditGreen(0.0),
@@ -53,13 +53,13 @@ pub fn setup_colour_edit_panel(
         .entity(key_values_panel)
         .add_children(&[red_label, red, green_label, green, blue_label, blue])
         .insert(OpenCloseReactor {
-            destination_id: open_destination_id.clone(),
+            source_id: open_source_id.clone(),
             open_state: Display::Grid,
         });
     let outer_panel = NodeBuilder::new()
         .row(vec![GridTrack::min_content(), GridTrack::min_content()])
         .build_and_spawn(commands);
-    let colour_panel = make_colour_panel(commands, colour_destination_id, open_destination_id);
+    let colour_panel = make_colour_panel(commands, colour_source_id, open_source_id);
     commands
         .entity(outer_panel)
         .add_children(&[colour_panel, key_values_panel]);
@@ -68,27 +68,27 @@ pub fn setup_colour_edit_panel(
 
 fn make_colour_panel(
     commands: &mut Commands,
-    colour_destination_id: String,
-    open_destination_id: String,
+    colour_source_id: String,
+    open_source_id: String,
 ) -> Entity {
-    let color_box = make_color_sample(commands, colour_destination_id);
+    let color_box = make_color_sample(commands, colour_source_id);
     let colour_panel = NodeBuilder::new()
         .column(vec![GridTrack::min_content(), GridTrack::flex(1.0)])
         // .background_color(Color::BLACK)
         .build_and_spawn(commands);
-    let plus_label = make_open_label(commands, open_destination_id);
+    let plus_label = make_open_label(commands, open_source_id);
     commands
         .entity(colour_panel)
         .add_children(&[plus_label, color_box]);
     colour_panel
 }
 
-fn make_open_label(commands: &mut Commands, open_destination_id: String) -> Entity {
+fn make_open_label(commands: &mut Commands, open_source_id: String) -> Entity {
     let text = TextBuilder::new().content("+").build_and_spawn(commands);
     commands.entity(text).insert((
         Interaction::default(),
         OpenClose {
-            destination_id: open_destination_id,
+            source_id: open_source_id,
             open: true,
         },
     ));
@@ -104,7 +104,7 @@ fn make_text(commands: &mut Commands, s: &str) -> Entity {
     TextBuilder::new().content(s).build_and_spawn(commands)
 }
 
-fn make_color_sample(commands: &mut Commands, colour_destination_id: String) -> Entity {
+fn make_color_sample(commands: &mut Commands, colour_source_id: String) -> Entity {
     let color_box = NodeBuilder::new()
         .height(Val::Px(25.0))
         .background_color(Color::BLACK)
@@ -113,7 +113,7 @@ fn make_color_sample(commands: &mut Commands, colour_destination_id: String) -> 
         .spawn((
             color_box,
             ColoringBox {
-                destination_id: colour_destination_id,
+                source_id: colour_source_id,
             },
         ))
         .id()

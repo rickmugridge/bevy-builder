@@ -6,7 +6,7 @@ use bevy::prelude::{BackgroundColor, Commands, Component, Entity, IntoScheduleCo
 
 #[derive(Component, Debug)]
 pub struct ColoringBox {
-    pub destination_id: String,
+    pub source_id: String,
 }
 
 pub struct ColorSamplePlugin;
@@ -24,23 +24,23 @@ fn change_color(
     mut commands: Commands,
 ) {
     for (
-        ButtonBorderColoration { destination_id },
+        ButtonBorderColoration { source_id },
         EditRed(red),
         EditGreen(green),
         EditBlue(blue),
         entity,
     ) in coloration_query.iter()
     {
-        println!("change_color 1st inner {entity}: {destination_id}");
+        println!("change_color 1st inner {entity}: {source_id}");
         for (mut background, coloring_box) in node_query.iter_mut() {
             println!(
                 "change_color inner {}, {} from {:?} to {:?}",
-                coloring_box.destination_id,
-                *destination_id,
+                coloring_box.source_id,
+                *source_id,
                 background.0,
                 Color::srgb(*red, *green, *blue)
             );
-            if coloring_box.destination_id == *destination_id {
+            if coloring_box.source_id == *source_id {
                 let new_color = Color::srgb(*red, *green, *blue);
                 if background.0 != new_color {
                     println!(

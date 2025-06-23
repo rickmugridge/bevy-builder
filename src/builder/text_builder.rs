@@ -1,8 +1,7 @@
+use crate::edit_plugin::text_edit_plugin::TextContentReactor;
 use bevy::prelude::*;
 use bevy::ui::ContentSize;
 use bevy::ui::widget::TextNodeFlags;
-
-#[derive(Debug, Component)]
 
 pub struct TextBuilder {
     content: String,
@@ -13,6 +12,7 @@ pub struct TextBuilder {
     shadow_color: Color,
     shadow_offset: Vec2,
     node: Node,
+    text_content_reactor: Option<TextContentReactor>,
 }
 
 impl TextBuilder {
@@ -26,9 +26,10 @@ impl TextBuilder {
             shadow_color: Color::NONE,
             shadow_offset: Vec2::ZERO,
             node: Node::default(),
+            text_content_reactor: None,
         }
     }
-    
+
     pub fn content<S: Into<String>>(mut self, content: S) -> Self {
         self.content = content.into();
         self
@@ -65,6 +66,11 @@ impl TextBuilder {
         self
     }
 
+    pub fn text_content_reactor(mut self, source_id: String) -> Self {
+        self.text_content_reactor = Some(TextContentReactor { source_id });
+        self
+    }
+
     pub fn build_and_spawn(self, commands: &mut Commands) -> Entity {
         let text = (
             Text::new(self.content),
@@ -79,6 +85,10 @@ impl TextBuilder {
             ContentSize::default(),
             self.node,
         );
-        commands.spawn(text).id()
+        let id = commands.spawn(text).id();
+        if let Some(text_content_reactor) = self.text_content_reactor {
+            commands.entity(id).insert(text_content_reactor);       
+        }
+        id
     }
 }

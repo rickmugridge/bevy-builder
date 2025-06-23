@@ -16,19 +16,19 @@ impl Plugin for OpenClosePlugin {
 #[derive(Component, Debug)]
 #[require(Interaction)]
 pub struct OpenClose {
-    pub destination_id: String,
+    pub source_id: String,
     pub open: bool,
 }
 
 #[derive(Component, Debug)]
 pub struct OpenCloseReactor {
-    pub destination_id: String,
+    pub source_id: String,
     pub open_state: Display,
 }
 
 #[derive(Event, Debug)]
 pub struct OpenCloseChanged {
-    pub destination_id: String,
+    pub source_id: String,
     pub open: bool,
 }
 
@@ -38,7 +38,7 @@ fn open_close(
     mut debounce: ResMut<DebounceMousePress>,
 ) {
     for (interaction, mut open_close) in query {
-        let destination_id = open_close.destination_id.clone();
+        let source_id = open_close.source_id.clone();
         let new_open_state = !open_close.open;
         match *interaction {
             Interaction::Pressed => {
@@ -47,7 +47,7 @@ fn open_close(
                     open_close.open = new_open_state;
                     commands.queue(move |w: &mut World| {
                         w.send_event(OpenCloseChanged {
-                            destination_id,
+                            source_id,
                             open: new_open_state,
                         });
                     })
@@ -63,13 +63,13 @@ fn open_close_reactor(
     mut query: Query<(&OpenCloseReactor, &mut Node)>,
 ) {
     for OpenCloseChanged {
-        destination_id,
+        source_id,
         open,
     } in events.read()
     {
-        println!("Open close reactor {destination_id} {open}");
+        println!("Open close reactor {source_id} {open}");
         for (reactor, mut node) in query.iter_mut() {
-            if reactor.destination_id == *destination_id {
+            if reactor.source_id == *source_id {
                 if *open {
                     node.display = reactor.open_state;
                 } else {

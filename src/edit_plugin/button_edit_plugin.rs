@@ -25,17 +25,17 @@ fn react_to_content_update(
 ) {
     for (button_id, children) in button_query.iter_mut() {
         for ButtonNameChange {
-            destination_id,
-            button_text,
+            source_id,
+            text: button_text,
         } in events.read()
         {
             println!(
                 "Event received for button: {} with button_text: {}",
-                destination_id, button_text
+                source_id, button_text
             );
-            if *destination_id == button_id.0 {
+            if *source_id == button_id.0 {
                 let mut text = text_query.get_mut(children[0]).unwrap();
-                // println!("Event received for button: {} with old content: {}", destination_id, text.0);
+                // println!("Event received for button: {} with old content: {}", source_id, text.0);
                 text.0 = button_text.to_string();
             }
         }
@@ -48,17 +48,17 @@ fn react_to_border_colour_update(
 ) {
     for (button_id, mut border_color) in button_query.iter_mut() {
         for (
-            ButtonBorderColoration { destination_id },
+            ButtonBorderColoration { source_id },
             EditRed(red),
             EditGreen(green),
             EditBlue(blue),
         ) in coloration_query.iter()
         {
-            if *destination_id == button_id.0 {
+            if *source_id == button_id.0 {
                 let new_color = Color::srgb(*red, *green, *blue);
                 if border_color.0 != new_color {
                     println!(
-                        "Button border colour change for {destination_id} from {:?} to {:?}",
+                        "Button border colour change for {source_id} from {:?} to {:?}",
                         border_color.0, new_color
                     );
                     border_color.0 = new_color;
@@ -70,8 +70,8 @@ fn react_to_border_colour_update(
 
 #[derive(Event, Debug)]
 pub struct ButtonNameChange {
-    pub destination_id: String,
-    pub button_text: String,
+    pub source_id: String,
+    pub text: String,
 }
 
 pub const DESTINATION_BUTTON: &str = "DESTINATION_BUTTON";

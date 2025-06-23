@@ -2,17 +2,16 @@ use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
 use crate::builder::text_field_builder::TextFieldBuilder;
 use crate::edit::colour_panel::setup_colour_edit_panel;
-use crate::ui_plugin::button_edit_plugin::{ButtonNameChange, DESTINATION_BUTTON};
+use crate::edit_plugin::button_edit_plugin::{ButtonNameChange, DESTINATION_BUTTON};
 use bevy::asset::AssetServer;
 use bevy::color::palettes::basic::{BLUE, GREEN, RED};
 use bevy::prelude::*;
 
-pub const TO_BUTTON_BACKGROUND_COLOR_OPEN_CLOSE: &str = "TO_BUTTON_BACKGROUND_COLOR_OPEN_CLOSE";
-pub const TO_BUTTON_BACKGROUND_COLOR_HOVER: &str = "TO_BUTTON_BACKGROUND_COLOR_HOVER";
+pub const BUTTON_BORDER_COLOR_OPEN_CLOSE: &str = "BUTTON_BORDER_COLOR_OPEN_CLOSE";
 
 #[derive(Component, Debug)]
 pub struct ButtonBorderColoration {
-    pub destination_id: String,
+    pub source_id: String,
 }
 
 pub fn setup_button_edit_panel(
@@ -46,7 +45,7 @@ fn setup_key_value_panel(commands: &mut Commands) -> Entity {
     let background_color_edit = setup_colour_edit_panel(
         commands,
         DESTINATION_BUTTON.to_string(),
-        TO_BUTTON_BACKGROUND_COLOR_OPEN_CLOSE.to_string(),
+        BUTTON_BORDER_COLOR_OPEN_CLOSE.to_string(),
     );
      let pairs = &[("Text:", text), ("Border colour:", background_color_edit)];
     add_key_value_pairs(pairs, key_values_panel, commands);
@@ -69,7 +68,7 @@ fn add_key_value_pairs(
 fn setup_text_edit_panel<S: Into<String>>(
     commands: &mut Commands,
     default_content: S,
-    destination_id: &'static str,
+    source_id: &'static str,
 ) -> Entity {
     TextFieldBuilder::new()
         .node(NodeBuilder::new().text_field_node().build())
@@ -78,11 +77,11 @@ fn setup_text_edit_panel<S: Into<String>>(
                 println!(
                     "Queue string update to {} to {}",
                     button_text,
-                    destination_id.to_string()
+                    source_id.to_string()
                 );
                 w.send_event(ButtonNameChange {
-                    destination_id: destination_id.to_string(),
-                    button_text,
+                    source_id: source_id.to_string(),
+                    text: button_text,
                 });
             })
         })

@@ -2,16 +2,17 @@ mod builder;
 mod display_panel;
 mod edit;
 mod ui_plugin;
+mod edit_plugin;
 
 use crate::builder::node_builder::NodeBuilder;
 use crate::display_panel::setup_display_panel;
 use crate::ui_plugin::button_plugin::ButtonPlugin;
-use crate::ui_plugin::edit_plugin::EditPlugin;
 use crate::ui_plugin::text_field_plugin::TextFieldPlugin;
 use bevy::color::palettes::basic::SILVER;
 use bevy::prelude::*;
 use edit::edit_panel::setup_edit_panel;
 use std::string::ToString;
+use crate::edit_plugin::EditPlugin;
 
 fn main() {
     App::new()
