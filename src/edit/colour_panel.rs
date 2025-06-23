@@ -4,9 +4,9 @@ use crate::builder::text_field_builder::TextFieldBuilder;
 use crate::edit::button_edit_panel::ButtonBorderColoration;
 use crate::ui_plugin::color_sample_plugin::ColoringBox;
 use crate::ui_plugin::open_close_plugin::{OpenClose, OpenCloseReactor};
-use bevy::color::palettes::basic::GREEN;
+use bevy::color::palettes::basic::{GREEN, WHITE};
 use bevy::color::Color;
-use bevy::prelude::{Commands, Component, Display, Entity, GridTrack, Val};
+use bevy::prelude::{Commands, Component, Display, Entity, GridTrack, Interaction, Val};
 
 pub fn setup_colour_edit_panel(
     commands: &mut Commands,
@@ -42,6 +42,7 @@ pub fn setup_colour_edit_panel(
         println!("Update EditBlue({value})");
         commands.entity(rgb_entity).insert((EditBlue(value), ColorValueChanged));
     });
+    // commands.entity(rgb_entity).log_components();
     commands
         .entity(key_values_panel)
         .add_children(&[red_label, red, green_label, green, blue_label, blue])
@@ -52,11 +53,35 @@ pub fn setup_colour_edit_panel(
     let outer_panel = NodeBuilder::new()
         .row(vec![GridTrack::min_content(), GridTrack::min_content()])
         .build_and_spawn(commands);
-    let color_box = make_color_sample(commands, colour_destination_id, open_destination_id);
+    let colour_panel = make_colour_panel(commands, colour_destination_id, open_destination_id);
     commands
         .entity(outer_panel)
-        .add_children(&[color_box, key_values_panel]);
+        .add_children(&[colour_panel, key_values_panel]);
     outer_panel
+}
+
+fn make_colour_panel(commands: &mut Commands, colour_destination_id: String, open_destination_id: String) -> Entity {
+    let color_box = make_color_sample(commands, colour_destination_id);
+    let colour_panel = NodeBuilder::new()
+        .column(vec![GridTrack::min_content(), GridTrack::flex(1.0)])
+        // .background_color(Color::BLACK)
+        .build_and_spawn(commands);
+    let plus_label = open_label(commands, open_destination_id);
+    commands
+        .entity(colour_panel).add_children(&[plus_label, color_box]);
+    colour_panel
+}
+
+fn open_label(commands: &mut Commands, open_destination_id: String) -> Entity {
+    let panel = NodeBuilder::new().background_color(GREEN.into()).border_of(Val::Px(1.),WHITE.into()).build_and_spawn(commands);
+    let text = TextBuilder::new().content("+").build_and_spawn(commands);
+    commands.entity(text).insert((Interaction::default(), OpenClose {
+        destination_id: open_destination_id,
+        open: false,
+    }));
+    commands
+        .entity(panel).add_children(&[text]);
+    panel
 }
 
 fn make_text(commands: &mut Commands, s: &str) -> Entity {
@@ -66,22 +91,16 @@ fn make_text(commands: &mut Commands, s: &str) -> Entity {
 fn make_color_sample(
     commands: &mut Commands,
     colour_destination_id: String,
-    open_destination_id: String,
 ) -> Entity {
     let color_box = NodeBuilder::new()
-        .height(Val::Px(20.0))
-        .border_of(Val::Px(1.0), Color::BLACK)
-        .background_color(Color::WHITE)
+        .height(Val::Px(25.0))
+        .background_color(Color::BLACK)
         .build();
     commands
         .spawn((
             color_box,
             ColoringBox {
                 destination_id: colour_destination_id,
-            },
-            OpenClose {
-                destination_id: open_destination_id,
-                open: false,
             },
         ))
         .id()
@@ -96,7 +115,7 @@ where
         .content("0.0")
         .on_change(move |button_text, commands| {
             if let Ok(value) = button_text.parse::<f32>() {
-                println!("colour has updated to in coloration: {value}");
+                println!("colour has updated in coloration: {value}");
                 let clamped_value = value.clamp(0.0, 1.0);
                 on_change(clamped_value, commands);
             }

@@ -13,7 +13,7 @@ pub struct ColorSamplePlugin;
 
 impl Plugin for ColorSamplePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, change_color.run_if(|query: Query<(), With<ColorValueChanged>>| !query.is_empty()) // todo Why is this needed? Single?
+        app.add_systems(Update, change_color.run_if(|query: Query<(), With<ColorValueChanged>>| !query.is_empty())
         );
     }
 }
