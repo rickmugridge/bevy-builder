@@ -4,8 +4,8 @@ use crate::builder::text_field_builder::TextFieldBuilder;
 use crate::edit::button_edit_panel::ButtonBorderColoration;
 use crate::ui_plugin::color_sample_plugin::ColoringBox;
 use crate::ui_plugin::open_close_plugin::{OpenClose, OpenCloseReactor};
-use bevy::color::palettes::basic::{GREEN, WHITE};
 use bevy::color::Color;
+use bevy::color::palettes::basic::{GREEN, WHITE};
 use bevy::prelude::{Commands, Component, Display, Entity, GridTrack, Interaction, Val};
 
 pub fn setup_colour_edit_panel(
@@ -30,17 +30,23 @@ pub fn setup_colour_edit_panel(
     let red_label = make_text(commands, "Red:");
     let red = coloration(commands, move |value, commands| {
         println!("Update EditRed({value})");
-        commands.entity(rgb_entity).insert((EditRed(value), ColorValueChanged));
+        commands
+            .entity(rgb_entity)
+            .insert((EditRed(value), ColorValueChanged));
     });
     let green_label = make_text(commands, "Green:");
     let green = coloration(commands, move |value, commands| {
         println!("Update EditGreen({value})");
-        commands.entity(rgb_entity).insert((EditGreen(value), ColorValueChanged));
+        commands
+            .entity(rgb_entity)
+            .insert((EditGreen(value), ColorValueChanged));
     });
     let blue_label = make_text(commands, "Blue:");
     let blue = coloration(commands, move |value, commands| {
         println!("Update EditBlue({value})");
-        commands.entity(rgb_entity).insert((EditBlue(value), ColorValueChanged));
+        commands
+            .entity(rgb_entity)
+            .insert((EditBlue(value), ColorValueChanged));
     });
     // commands.entity(rgb_entity).log_components();
     commands
@@ -60,27 +66,37 @@ pub fn setup_colour_edit_panel(
     outer_panel
 }
 
-fn make_colour_panel(commands: &mut Commands, colour_destination_id: String, open_destination_id: String) -> Entity {
+fn make_colour_panel(
+    commands: &mut Commands,
+    colour_destination_id: String,
+    open_destination_id: String,
+) -> Entity {
     let color_box = make_color_sample(commands, colour_destination_id);
     let colour_panel = NodeBuilder::new()
         .column(vec![GridTrack::min_content(), GridTrack::flex(1.0)])
         // .background_color(Color::BLACK)
         .build_and_spawn(commands);
-    let plus_label = open_label(commands, open_destination_id);
+    let plus_label = make_open_label(commands, open_destination_id);
     commands
-        .entity(colour_panel).add_children(&[plus_label, color_box]);
+        .entity(colour_panel)
+        .add_children(&[plus_label, color_box]);
     colour_panel
 }
 
-fn open_label(commands: &mut Commands, open_destination_id: String) -> Entity {
-    let panel = NodeBuilder::new().background_color(GREEN.into()).border_of(Val::Px(1.),WHITE.into()).build_and_spawn(commands);
+fn make_open_label(commands: &mut Commands, open_destination_id: String) -> Entity {
     let text = TextBuilder::new().content("+").build_and_spawn(commands);
-    commands.entity(text).insert((Interaction::default(), OpenClose {
-        destination_id: open_destination_id,
-        open: false,
-    }));
-    commands
-        .entity(panel).add_children(&[text]);
+    commands.entity(text).insert((
+        Interaction::default(),
+        OpenClose {
+            destination_id: open_destination_id,
+            open: true,
+        },
+    ));
+    let panel = NodeBuilder::new()
+        .background_color(GREEN.into())
+        .border_of(Val::Px(1.), WHITE.into())
+        .build_and_spawn(commands);
+    commands.entity(panel).add_children(&[text]);
     panel
 }
 
@@ -88,10 +104,7 @@ fn make_text(commands: &mut Commands, s: &str) -> Entity {
     TextBuilder::new().content(s).build_and_spawn(commands)
 }
 
-fn make_color_sample(
-    commands: &mut Commands,
-    colour_destination_id: String,
-) -> Entity {
+fn make_color_sample(commands: &mut Commands, colour_destination_id: String) -> Entity {
     let color_box = NodeBuilder::new()
         .height(Val::Px(25.0))
         .background_color(Color::BLACK)
