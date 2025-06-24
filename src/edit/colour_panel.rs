@@ -10,13 +10,13 @@ use bevy::prelude::{Commands, Component, Display, Entity, GridTrack, Interaction
 
 pub fn setup_colour_edit_panel(
     commands: &mut Commands,
-    colour_source_id: String,
-    open_source_id: String,
+    colour_source_id: &str,
+    open_source_id: &str,
 ) -> Entity {
     let rgb_entity = commands
         .spawn((
             ButtonBorderColoration {
-                source_id: colour_source_id.clone(),
+                source_id: colour_source_id.into(),
             },
             EditRed(0.0),
             EditGreen(0.0),
@@ -53,7 +53,7 @@ pub fn setup_colour_edit_panel(
         .entity(key_values_panel)
         .add_children(&[red_label, red, green_label, green, blue_label, blue])
         .insert(OpenCloseReactor {
-            source_id: open_source_id.clone(),
+            source_id: open_source_id.into(),
             open_state: Display::Grid,
         });
     let outer_panel = NodeBuilder::new()
@@ -68,15 +68,14 @@ pub fn setup_colour_edit_panel(
 
 fn make_colour_panel(
     commands: &mut Commands,
-    colour_source_id: String,
-    open_source_id: String,
+    colour_source_id: &str,
+    open_source_id: &str,
 ) -> Entity {
-    let color_box = make_color_sample(commands, colour_source_id);
+    let color_box = make_color_sample(commands, colour_source_id.into());
     let colour_panel = NodeBuilder::new()
         .column(vec![GridTrack::min_content(), GridTrack::flex(1.0)])
-        // .background_color(Color::BLACK)
         .build_and_spawn(commands);
-    let plus_label = make_open_label(commands, open_source_id);
+    let plus_label = make_open_label(commands, open_source_id.into());
     commands
         .entity(colour_panel)
         .add_children(&[plus_label, color_box]);

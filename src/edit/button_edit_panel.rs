@@ -2,12 +2,11 @@ use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
 use crate::builder::text_field_builder::TextFieldBuilder;
 use crate::edit::colour_panel::setup_colour_edit_panel;
-use crate::edit_plugin::button_edit_plugin::{ButtonNameChange, DESTINATION_BUTTON};
+use crate::edit::sources::{BUTTON_BORDER_COLOR_OPEN_CLOSE, BUTTON_BORDER_COLOR_SOURCE, BUTTON_TEXT_SOURCE};
+use crate::edit_plugin::text_edit_plugin::TextContentChange;
 use bevy::asset::AssetServer;
 use bevy::color::palettes::basic::{BLUE, GREEN, RED};
 use bevy::prelude::*;
-
-pub const BUTTON_BORDER_COLOR_OPEN_CLOSE: &str = "BUTTON_BORDER_COLOR_OPEN_CLOSE";
 
 #[derive(Component, Debug)]
 pub struct ButtonBorderColoration {
@@ -41,13 +40,13 @@ fn setup_key_value_panel(commands: &mut Commands) -> Entity {
         .key_value_pairs()
         .background_color(GREEN.into())
         .build_and_spawn(commands);
-    let text = setup_text_edit_panel(commands, "Default", DESTINATION_BUTTON);
+    let text = setup_text_edit_panel(commands, "Default", BUTTON_TEXT_SOURCE);
     let background_color_edit = setup_colour_edit_panel(
         commands,
-        DESTINATION_BUTTON.to_string(),
-        BUTTON_BORDER_COLOR_OPEN_CLOSE.to_string(),
+        BUTTON_BORDER_COLOR_SOURCE,
+        BUTTON_BORDER_COLOR_OPEN_CLOSE,
     );
-     let pairs = &[("Text:", text), ("Border colour:", background_color_edit)];
+    let pairs = &[("Text:", text), ("Border colour:", background_color_edit)];
     add_key_value_pairs(pairs, key_values_panel, commands);
     key_values_panel
 }
@@ -79,9 +78,9 @@ fn setup_text_edit_panel<S: Into<String>>(
                     button_text,
                     source_id.to_string()
                 );
-                w.send_event(ButtonNameChange {
-                    source_id: source_id.to_string(),
-                    text: button_text,
+                w.send_event(TextContentChange {
+                    source_id: source_id.into(),
+                    contents: button_text,
                 });
             })
         })

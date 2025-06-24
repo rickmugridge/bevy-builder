@@ -7,7 +7,8 @@ pub struct TextEditPlugin;
 impl Plugin for TextEditPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, (react_to_content_update, react_to_colour_update))
-            .add_event::<TextContentChange>();
+            .add_event::<TextContentChange>()
+            .add_event::<TextColorChange>();
     }
 }
 
@@ -61,7 +62,7 @@ fn react_to_colour_update(
     for TextColorChange { source_id, color } in events.read() {
         for (mut text_color, reactor) in text_query.iter_mut() {
             println!(
-                "Event received for Text: {} with content: {:?}",
+                "Event received for Text: {} with colour: {:?}",
                 source_id, color
             );
             if *source_id == reactor.source_id {

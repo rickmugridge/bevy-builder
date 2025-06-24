@@ -1,4 +1,4 @@
-use crate::edit_plugin::text_edit_plugin::TextContentReactor;
+use crate::edit_plugin::text_edit_plugin::{TextColorReactor, TextContentReactor};
 use bevy::prelude::*;
 use bevy::ui::ContentSize;
 use bevy::ui::widget::TextNodeFlags;
@@ -13,6 +13,7 @@ pub struct TextBuilder {
     shadow_offset: Vec2,
     node: Node,
     text_content_reactor: Option<TextContentReactor>,
+    text_color_reactor: Option<TextColorReactor>,
 }
 
 impl TextBuilder {
@@ -27,6 +28,7 @@ impl TextBuilder {
             shadow_offset: Vec2::ZERO,
             node: Node::default(),
             text_content_reactor: None,
+            text_color_reactor: None,
         }
     }
 
@@ -66,8 +68,13 @@ impl TextBuilder {
         self
     }
 
-    pub fn text_content_reactor(mut self, source_id: String) -> Self {
-        self.text_content_reactor = Some(TextContentReactor { source_id });
+    pub fn text_content_reactor(mut self, source_id: &str) -> Self {
+        self.text_content_reactor = Some(TextContentReactor { source_id : source_id.into()});
+        self
+    }
+
+    pub fn text_color_reactor(mut self, source_id:  &str) -> Self {
+        self.text_color_reactor = Some(TextColorReactor { source_id: source_id.into() });
         self
     }
 
@@ -88,6 +95,9 @@ impl TextBuilder {
         let id = commands.spawn(text).id();
         if let Some(text_content_reactor) = self.text_content_reactor {
             commands.entity(id).insert(text_content_reactor);       
+        }
+       if let Some(text_color_reactor) = self.text_color_reactor {
+            commands.entity(id).insert(text_color_reactor);       
         }
         id
     }

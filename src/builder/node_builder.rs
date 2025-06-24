@@ -1,3 +1,5 @@
+use crate::edit_plugin::background_color_edit_plugin::BackgroundColorReactor;
+use crate::edit_plugin::border_color_edit_plugin::BorderColorReactor;
 use bevy::color::palettes::css::WHITE;
 use bevy::prelude::Val::Px;
 use bevy::prelude::*;
@@ -6,6 +8,8 @@ pub struct NodeBuilder {
     node: Node,
     border_color: BorderColor,
     background_color: BackgroundColor,
+    border_color_reactor: Option<BorderColorReactor>,
+    background_color_reactor: Option<BackgroundColorReactor>,
 }
 
 impl Default for NodeBuilder {
@@ -14,6 +18,8 @@ impl Default for NodeBuilder {
             node: Node::default(),
             border_color: BorderColor::default(),
             background_color: BackgroundColor::default(),
+            border_color_reactor: None,
+            background_color_reactor: None,
         }
     }
 }
@@ -234,13 +240,34 @@ impl NodeBuilder {
         self
     }
 
+    pub fn border_color_reactor(mut self, source_id: &str) -> Self {
+        self.border_color_reactor = Some(BorderColorReactor {
+            source_id: source_id.into(),
+        });
+        self
+    }
+
+    pub fn background_color_reactor(mut self, source_id: &str) -> Self {
+        self.background_color_reactor = Some(BackgroundColorReactor {
+            source_id: source_id.into(),
+        });
+        self
+    }
+
     pub fn build(self) -> Node {
         self.node
     }
 
     pub fn build_and_spawn(self, commands: &mut Commands) -> Entity {
-        commands
+        let id = commands
             .spawn((self.node, self.border_color, self.background_color))
-            .id()
+            .id();
+        if let Some(border_color_reactor) = self.border_color_reactor {
+            commands.entity(id).insert(border_color_reactor);
+        }
+        if let Some(background_color_reactor) = self.background_color_reactor {
+            commands.entity(id).insert(background_color_reactor);
+        }
+        id
     }
 }
