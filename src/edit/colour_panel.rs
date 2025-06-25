@@ -1,22 +1,22 @@
 use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
 use crate::builder::text_field_builder::TextFieldBuilder;
-use crate::edit::button_edit_panel::ButtonBorderColoration;
-use crate::ui_plugin::color_sample_plugin::ColoringBox;
+use crate::edit::sources::BUTTON_BORDER_COLOR_SOURCE;
+use crate::ui_plugin::color_plugin::{BackgroundColorChangeReactor, ColorValueChanged, Coloration, EditBlue, EditGreen, EditRed};
 use crate::ui_plugin::open_close_plugin::{OpenClose, OpenCloseReactor};
-use bevy::color::Color;
 use bevy::color::palettes::basic::{GREEN, WHITE};
-use bevy::prelude::{Commands, Component, Display, Entity, GridTrack, Interaction, Val};
+use bevy::color::Color;
+use bevy::prelude::{Commands, Display, Entity, GridTrack, Interaction, Val};
 
 pub fn setup_colour_edit_panel(
     commands: &mut Commands,
-    colour_source_id: &str,
+    color_source_id: &str,
     open_source_id: &str,
 ) -> Entity {
     let rgb_entity = commands
         .spawn((
-            ButtonBorderColoration {
-                source_id: colour_source_id.into(),
+            Coloration {
+                source_id: BUTTON_BORDER_COLOR_SOURCE.into(),
             },
             EditRed(0.0),
             EditGreen(0.0),
@@ -29,21 +29,21 @@ pub fn setup_colour_edit_panel(
         .build_and_spawn(commands);
     let red_label = make_text(commands, "Red:");
     let red = coloration(commands, move |value, commands| {
-        println!("Update EditRed({value})");
+        // println!("Update EditRed({value})");
         commands
             .entity(rgb_entity)
             .insert((EditRed(value), ColorValueChanged));
     });
     let green_label = make_text(commands, "Green:");
     let green = coloration(commands, move |value, commands| {
-        println!("Update EditGreen({value})");
+        // println!("Update EditGreen({value})");
         commands
             .entity(rgb_entity)
             .insert((EditGreen(value), ColorValueChanged));
     });
     let blue_label = make_text(commands, "Blue:");
     let blue = coloration(commands, move |value, commands| {
-        println!("Update EditBlue({value})");
+        // println!("Update EditBlue({value})");
         commands
             .entity(rgb_entity)
             .insert((EditBlue(value), ColorValueChanged));
@@ -59,7 +59,7 @@ pub fn setup_colour_edit_panel(
     let outer_panel = NodeBuilder::new()
         .row(vec![GridTrack::min_content(), GridTrack::min_content()])
         .build_and_spawn(commands);
-    let colour_panel = make_colour_panel(commands, colour_source_id, open_source_id);
+    let colour_panel = make_colour_panel(commands, color_source_id, open_source_id);
     commands
         .entity(outer_panel)
         .add_children(&[colour_panel, key_values_panel]);
@@ -68,10 +68,10 @@ pub fn setup_colour_edit_panel(
 
 fn make_colour_panel(
     commands: &mut Commands,
-    colour_source_id: &str,
+    color_source_id: &str,
     open_source_id: &str,
 ) -> Entity {
-    let color_box = make_color_sample(commands, colour_source_id.into());
+    let color_box = make_color_sample(commands, color_source_id);
     let colour_panel = NodeBuilder::new()
         .column(vec![GridTrack::min_content(), GridTrack::flex(1.0)])
         .build_and_spawn(commands);
@@ -103,16 +103,15 @@ fn make_text(commands: &mut Commands, s: &str) -> Entity {
     TextBuilder::new().content(s).build_and_spawn(commands)
 }
 
-fn make_color_sample(commands: &mut Commands, colour_source_id: String) -> Entity {
+fn make_color_sample(commands: &mut Commands, source_id: &str) -> Entity {
     let color_box = NodeBuilder::new()
         .height(Val::Px(25.0))
         .background_color(Color::BLACK)
         .build();
     commands
         .spawn((
-            color_box,
-            ColoringBox {
-                source_id: colour_source_id,
+            color_box, BackgroundColorChangeReactor {
+                source_id: source_id.into(),
             },
         ))
         .id()
@@ -134,15 +133,3 @@ where
         })
         .build_and_spawn(commands)
 }
-
-#[derive(Component, Debug)]
-pub struct EditRed(pub f32);
-
-#[derive(Component, Debug)]
-pub struct EditGreen(pub f32);
-
-#[derive(Component, Debug)]
-pub struct EditBlue(pub f32);
-
-#[derive(Component)]
-pub struct ColorValueChanged;
