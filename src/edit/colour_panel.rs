@@ -1,22 +1,24 @@
 use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
 use crate::builder::text_field_builder::TextFieldBuilder;
-use crate::edit::sources::BUTTON_BORDER_COLOR_SOURCE;
-use crate::ui_plugin::color_plugin::{BackgroundColorChangeReactor, ColorValueChanged, Coloration, EditBlue, EditGreen, EditRed};
+use crate::ui_plugin::color_plugin::{
+    BackgroundColorChangeReactor, ColorValueChanged, Coloration, EditBlue, EditGreen, EditRed,
+};
 use crate::ui_plugin::open_close_plugin::{OpenClose, OpenCloseReactor};
-use bevy::color::palettes::basic::{GREEN, WHITE};
 use bevy::color::Color;
+use bevy::color::palettes::basic::{GREEN, WHITE};
 use bevy::prelude::{Commands, Display, Entity, GridTrack, Interaction, Val};
 
 pub fn setup_colour_edit_panel(
     commands: &mut Commands,
-    color_source_id: &str,
-    open_source_id: &str,
+    color_source_id: &str
 ) -> Entity {
+    let mut open_close_source_id = color_source_id.to_string();
+    open_close_source_id.push_str("_open_close");
     let rgb_entity = commands
         .spawn((
             Coloration {
-                source_id: BUTTON_BORDER_COLOR_SOURCE.into(),
+                source_id: color_source_id.into(),
             },
             EditRed(0.0),
             EditGreen(0.0),
@@ -53,13 +55,13 @@ pub fn setup_colour_edit_panel(
         .entity(key_values_panel)
         .add_children(&[red_label, red, green_label, green, blue_label, blue])
         .insert(OpenCloseReactor {
-            source_id: open_source_id.into(),
+            source_id: open_close_source_id.clone(),
             open_state: Display::Grid,
         });
     let outer_panel = NodeBuilder::new()
         .row(vec![GridTrack::min_content(), GridTrack::min_content()])
         .build_and_spawn(commands);
-    let colour_panel = make_colour_panel(commands, color_source_id, open_source_id);
+    let colour_panel = make_colour_panel(commands, color_source_id, open_close_source_id);
     commands
         .entity(outer_panel)
         .add_children(&[colour_panel, key_values_panel]);
@@ -69,7 +71,7 @@ pub fn setup_colour_edit_panel(
 fn make_colour_panel(
     commands: &mut Commands,
     color_source_id: &str,
-    open_source_id: &str,
+    open_source_id: String,
 ) -> Entity {
     let color_box = make_color_sample(commands, color_source_id);
     let colour_panel = NodeBuilder::new()
@@ -110,7 +112,8 @@ fn make_color_sample(commands: &mut Commands, source_id: &str) -> Entity {
         .build();
     commands
         .spawn((
-            color_box, BackgroundColorChangeReactor {
+            color_box,
+            BackgroundColorChangeReactor {
                 source_id: source_id.into(),
             },
         ))

@@ -7,7 +7,6 @@ use bevy::prelude::Val::Px;
 use bevy::prelude::*;
 
 pub fn setup_edit_panel(commands: &mut Commands, _asset_server: &Res<AssetServer>) -> Entity {
-    // let font = asset_server.load("fonts/FiraSans-Bold.ttf");
     let top_label = TextBuilder::new()
         .content("Edit:")
         .build_and_spawn(commands);

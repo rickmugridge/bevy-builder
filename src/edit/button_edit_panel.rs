@@ -2,16 +2,11 @@ use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
 use crate::builder::text_field_builder::TextFieldBuilder;
 use crate::edit::colour_panel::setup_colour_edit_panel;
-use crate::edit::sources::{BUTTON_BORDER_COLOR_OPEN_CLOSE, BUTTON_BORDER_COLOR_SOURCE, BUTTON_TEXT_SOURCE};
+use crate::edit::sources::{BUTTON_BORDER_COLOR_SOURCE, BUTTON_TEXT_SOURCE};
 use crate::edit_plugin::text_edit_plugin::TextContentChange;
 use bevy::asset::AssetServer;
 use bevy::color::palettes::basic::{BLUE, GREEN, RED};
 use bevy::prelude::*;
-
-#[derive(Component, Debug)]
-pub struct ButtonBorderColoration {
-    pub source_id: String,
-}
 
 pub fn setup_button_edit_panel(
     commands: &mut Commands,
@@ -41,12 +36,11 @@ fn setup_key_value_panel(commands: &mut Commands) -> Entity {
         .background_color(GREEN.into())
         .build_and_spawn(commands);
     let text = setup_text_edit_panel(commands, "Default", BUTTON_TEXT_SOURCE);
-    let background_color_edit = setup_colour_edit_panel(
+    let border_color_edit = setup_colour_edit_panel(
         commands,
         BUTTON_BORDER_COLOR_SOURCE,
-        BUTTON_BORDER_COLOR_OPEN_CLOSE,
     );
-    let pairs = &[("Text:", text), ("Border colour:", background_color_edit)];
+    let pairs = &[("Text:", text), ("Border colour:", border_color_edit)];
     add_key_value_pairs(pairs, key_values_panel, commands);
     key_values_panel
 }
