@@ -1,6 +1,6 @@
 use crate::builder::node_builder::NodeBuilder;
 use crate::ui_plugin::number_plugin::NumberChangedEvent;
-use bevy::color::palettes::basic::TEAL;
+use bevy::color::palettes::basic::{RED, TEAL};
 use bevy::prelude::*;
 use bevy::ui::ContentSize;
 use bevy::ui::widget::TextNodeFlags;
@@ -11,6 +11,7 @@ use std::sync::Arc;
 pub struct TextField {
     pub on_change: Option<TextChangeCallback>,
     pub validate: Option<TextValidationCallback>,
+    pub invalid: bool
 }
 
 type TextChangeCallback = Arc<dyn Fn(String, &mut Commands) + Send + Sync>;
@@ -73,8 +74,8 @@ impl TextFieldBuilder {
         self.text_field.validate = Some(Arc::new(callback));
         self
     }
-    
-    pub fn validate_is_number(mut self) -> Self {
+
+    pub fn validate_is_number(self) -> Self {
         self.validate(|content| content.parse::<f32>().is_ok())
     }
 
@@ -141,7 +142,16 @@ impl TextFieldBuilder {
             .background_color(Color::WHITE)
             .build_and_spawn(commands);
         let text_entity = commands.spawn(text).id();
-        commands.entity(border_node).add_child(text_entity);
+        let error_text = commands
+            .spawn((
+                Text::new("Error"),
+                TextColor(RED.into()),
+                Visibility::Hidden,
+            ))
+            .id();
+        commands
+            .entity(border_node)
+            .add_children(&[text_entity, error_text]);
         border_node
     }
 }

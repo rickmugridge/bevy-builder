@@ -112,9 +112,9 @@ fn tick_cursor(mut cursor_timer: Query<(&mut Text, &mut CursorTimer)>, time: Res
 fn keyboard_input(
     mut commands: Commands,
     mut events: EventReader<KeyboardInput>,
-    edit_text: Single<(&mut Text, &TextField, &mut CursorTimer, Entity)>,
+    edit_text: Single<(&mut Text, &mut TextField, &mut CursorTimer, Entity)>,
 ) {
-    let (mut text, text_field, mut cursor, entity) = edit_text.into_inner();
+    let (mut text, mut text_field, mut cursor, entity) = edit_text.into_inner();
     for event in events.read() {
         if !event.state.is_pressed() {
             continue;
@@ -127,15 +127,8 @@ fn keyboard_input(
             (Key::Backspace, _) if cursor.position > 0 => {
                 text.remove(cursor.position - 1);
                 cursor.position -= 1;
-                if let Some(on_change) = &text_field.on_change {
-                    let text = text_without_cursor(text.0.clone(), &cursor);
-                    on_change(text, &mut commands);
-                }
-                if let Some(validate) = &text_field.validate {
-                    if !validate(text.0.clone()) {
-                        println!("Invalid text");
-                    }
-                }
+                check_on_change(&mut commands, &mut text, &mut text_field, &mut cursor);
+                validate(&text, &mut text_field, &mut cursor);
             }
             (Key::ArrowLeft, _) if cursor.position > 0 => {
                 text.remove(cursor.position);
@@ -151,25 +144,46 @@ fn keyboard_input(
                 if inserted_text.chars().all(is_printable_char) {
                     text.insert_str(cursor.position, inserted_text);
                     cursor.position += 1;
-                    if let Some(on_change) = &text_field.on_change {
-                        let text = text_without_cursor(text.0.clone(), &cursor);
-                        on_change(text, &mut commands);
-                    }
-                    if let Some(validate) = &text_field.validate {
-                        if !validate(text.0.clone()) {
-                            println!("Invalid text");
-                        }
-                    }
+                    check_on_change(&mut commands, &mut text, &mut text_field, &mut cursor);
+                    validate(&text, &mut text_field, &mut cursor);
                 }
             }
             _ => continue,
         }
     }
+}
 
-    fn text_without_cursor(mut text: String, cursor: &CursorTimer) -> String {
-        text.remove(cursor.position);
-        text
+fn check_on_change(
+    mut commands: &mut Commands,
+    text: &mut Mut<Text>,
+    text_field: &mut Mut<TextField>,
+    cursor: &mut Mut<CursorTimer>,
+) {
+    if let Some(on_change) = &text_field.on_change {
+        let text = text_without_cursor(text.0.clone(), &cursor);
+        on_change(text, &mut commands);
     }
+}
+
+fn validate(text: &Mut<Text>, text_field: &mut Mut<TextField>, cursor: &Mut<CursorTimer>) {
+    if let Some(validate) = &text_field.validate {
+        if validate(text_without_cursor(text.0.clone(), &cursor)) {
+            if text_field.invalid {
+                text_field.invalid = false;
+                println!("Text now valid");
+            }
+        } else {
+            if !text_field.invalid {
+                text_field.invalid = true;
+                println!("Text now invalid");
+            }
+        }
+    }
+}
+
+fn text_without_cursor(mut text: String, cursor: &CursorTimer) -> String {
+    text.remove(cursor.position);
+    text
 }
 
 // this logic is taken from egui-winit:
