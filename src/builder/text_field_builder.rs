@@ -11,11 +11,11 @@ use std::sync::Arc;
 pub struct TextField {
     pub on_change: Option<TextChangeCallback>,
     pub validate: Option<TextValidationCallback>,
-    pub invalid: bool
+    pub invalid: bool,
 }
 
 type TextChangeCallback = Arc<dyn Fn(String, &mut Commands) + Send + Sync>;
-type TextValidationCallback = Arc<dyn Fn(String) -> bool + Send + Sync>;
+type TextValidationCallback = Arc<dyn Fn(String) -> Option<String> + Send + Sync>; // None means it's valid
 
 pub struct TextFieldBuilder {
     text_field: TextField,
@@ -69,14 +69,14 @@ impl TextFieldBuilder {
 
     pub fn validate<F>(mut self, callback: F) -> Self
     where
-        F: Fn(String) -> bool + Send + Sync + 'static,
+        F: Fn(String) -> Option<String> + Send + Sync + 'static,
     {
         self.text_field.validate = Some(Arc::new(callback));
         self
     }
 
     pub fn validate_is_number(self) -> Self {
-        self.validate(|content| content.parse::<f32>().is_ok())
+        self.validate(|content| content.parse::<f32>().err().map(|_| "Not a number".into()))
     }
 
     pub fn content<S: Into<String>>(mut self, content: S) -> Self {

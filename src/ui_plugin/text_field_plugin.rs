@@ -197,25 +197,29 @@ fn validate(
     text: &Mut<Text>,
     text_field: &mut Mut<TextField>,
     cursor: &Mut<CursorTimer>,
-    mut commands: &mut Commands,
+    commands: &mut Commands,
     error_text: Option<Entity>,
 ) {
     if let Some(error_text) = error_text {
         if let Some(validate) = &text_field.validate {
-            if validate(text_without_cursor(text.0.clone(), &cursor)) {
+            if let Some(error) = validate(text_without_cursor(text.0.clone(), &cursor)) {
+                if !text_field.invalid {
+                    text_field.invalid = true;
+                    commands.entity(error_text).insert((
+                        Visibility::Visible,
+                        Text::new(error),
+                        TextColor(RED.into()),
+                    ));
+                }
+            } else {
                 if text_field.invalid {
                     text_field.invalid = false;
                     commands.entity(error_text).insert(Visibility::Hidden);
                 }
-            } else {
-                if !text_field.invalid {
-                    text_field.invalid = true;
-                    commands.entity(error_text).insert(Visibility::Visible);
-                }
             }
         }
     }
-}
+ }
 
 fn text_without_cursor(mut text: String, cursor: &CursorTimer) -> String {
     text.remove(cursor.position);
