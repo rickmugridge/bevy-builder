@@ -129,10 +129,10 @@ where
         .content("0.0")
         .on_change(move |button_text, commands| {
             if let Ok(value) = button_text.parse::<f32>() {
-                // println!("colour has updated in coloration: {value}");
                 let clamped_value = value.clamp(0.0, 1.0);
                 on_change(clamped_value, commands);
             }
         })
+        .validate_is_number()
         .build_and_spawn(commands)
 }

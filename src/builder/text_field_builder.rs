@@ -2,17 +2,19 @@ use crate::builder::node_builder::NodeBuilder;
 use crate::ui_plugin::number_plugin::NumberChangedEvent;
 use bevy::color::palettes::basic::TEAL;
 use bevy::prelude::*;
-use bevy::ui::widget::TextNodeFlags;
 use bevy::ui::ContentSize;
+use bevy::ui::widget::TextNodeFlags;
 use std::sync::Arc;
 
 #[derive(Component, Default)]
 #[require(Interaction)]
 pub struct TextField {
     pub on_change: Option<TextChangeCallback>,
+    pub validate: Option<TextValidationCallback>,
 }
 
 type TextChangeCallback = Arc<dyn Fn(String, &mut Commands) + Send + Sync>;
+type TextValidationCallback = Arc<dyn Fn(String) -> bool + Send + Sync>;
 
 pub struct TextFieldBuilder {
     text_field: TextField,
@@ -61,6 +63,19 @@ impl TextFieldBuilder {
                 });
             }
         })
+        .validate_is_number()
+    }
+
+    pub fn validate<F>(mut self, callback: F) -> Self
+    where
+        F: Fn(String) -> bool + Send + Sync + 'static,
+    {
+        self.text_field.validate = Some(Arc::new(callback));
+        self
+    }
+    
+    pub fn validate_is_number(mut self) -> Self {
+        self.validate(|content| content.parse::<f32>().is_ok())
     }
 
     pub fn content<S: Into<String>>(mut self, content: S) -> Self {

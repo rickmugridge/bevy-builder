@@ -48,7 +48,7 @@ fn react_to_deselect(
     mut cursor_query: Query<(Entity, &mut Text, &CursorTimer)>,
     mut events: EventReader<TextFieldDeselected>,
 ) {
-    for (entity,mut text, cursor) in cursor_query.iter_mut() {
+    for (entity, mut text, cursor) in cursor_query.iter_mut() {
         for TextFieldDeselected { current_id } in events.read() {
             if *current_id != entity {
                 text.remove(cursor.position);
@@ -131,6 +131,11 @@ fn keyboard_input(
                     let text = text_without_cursor(text.0.clone(), &cursor);
                     on_change(text, &mut commands);
                 }
+                if let Some(validate) = &text_field.validate {
+                    if !validate(text.0.clone()) {
+                        println!("Invalid text");
+                    }
+                }
             }
             (Key::ArrowLeft, _) if cursor.position > 0 => {
                 text.remove(cursor.position);
@@ -149,6 +154,11 @@ fn keyboard_input(
                     if let Some(on_change) = &text_field.on_change {
                         let text = text_without_cursor(text.0.clone(), &cursor);
                         on_change(text, &mut commands);
+                    }
+                    if let Some(validate) = &text_field.validate {
+                        if !validate(text.0.clone()) {
+                            println!("Invalid text");
+                        }
                     }
                 }
             }
