@@ -72,9 +72,7 @@ fn mouse_handling(
                 let length = text.0.len();
                 text.0.insert(length, '_');
                 commands.entity(entity).insert(CursorTimer::new(length)); // also signals it is selected
-                commands.queue(move |w: &mut World| {
-                    w.send_event(TextFieldDeselected { current_id: entity });
-                })
+                deselect_others(&mut commands, entity);
             }
             Interaction::Hovered => {
                 background_color.0 = GREEN.into();
@@ -84,6 +82,12 @@ fn mouse_handling(
             }
         }
     }
+}
+
+fn deselect_others(commands: &mut Commands, entity: Entity) {
+    commands.queue(move |w: &mut World| {
+        w.send_event(TextFieldDeselected { current_id: entity });
+    })
 }
 
 fn tick_cursor(mut cursor_timer: Query<(&mut Text, &mut CursorTimer)>, time: Res<Time>) {
