@@ -112,9 +112,25 @@ fn tick_cursor(mut cursor_timer: Query<(&mut Text, &mut CursorTimer)>, time: Res
 fn keyboard_input(
     mut commands: Commands,
     mut events: EventReader<KeyboardInput>,
-    edit_text: Single<(&mut Text, &mut TextField, &mut CursorTimer, Entity)>,
+    edit_text: Single<(
+        &mut Text,
+        &mut TextField,
+        &mut CursorTimer,
+        Entity,
+        &ChildOf,
+    )>,
+    children_query: Query<&Children>,
 ) {
-    let (mut text, mut text_field, mut cursor, entity) = edit_text.into_inner();
+    let (mut text, mut text_field, mut cursor, entity, parent) = edit_text.into_inner();
+    let mut error_text: Option<Entity> = None;
+    if let Ok(children) = children_query.get(parent.0) {
+        // Get the second child if it exists
+        if children.len() >= 2 {
+            error_text = Some(children[1]);
+            // commands.entity(second_child).insert(Visibility::Visible);
+        }
+    }
+
     for event in events.read() {
         if !event.state.is_pressed() {
             continue;
@@ -128,7 +144,13 @@ fn keyboard_input(
                 text.remove(cursor.position - 1);
                 cursor.position -= 1;
                 check_on_change(&mut commands, &mut text, &mut text_field, &mut cursor);
-                validate(&text, &mut text_field, &mut cursor);
+                validate(
+                    &text,
+                    &mut text_field,
+                    &mut cursor,
+                    &mut commands,
+                    error_text,
+                );
             }
             (Key::ArrowLeft, _) if cursor.position > 0 => {
                 text.remove(cursor.position);
@@ -145,7 +167,13 @@ fn keyboard_input(
                     text.insert_str(cursor.position, inserted_text);
                     cursor.position += 1;
                     check_on_change(&mut commands, &mut text, &mut text_field, &mut cursor);
-                    validate(&text, &mut text_field, &mut cursor);
+                    validate(
+                        &text,
+                        &mut text_field,
+                        &mut cursor,
+                        &mut commands,
+                        error_text,
+                    );
                 }
             }
             _ => continue,
@@ -165,17 +193,25 @@ fn check_on_change(
     }
 }
 
-fn validate(text: &Mut<Text>, text_field: &mut Mut<TextField>, cursor: &Mut<CursorTimer>) {
-    if let Some(validate) = &text_field.validate {
-        if validate(text_without_cursor(text.0.clone(), &cursor)) {
-            if text_field.invalid {
-                text_field.invalid = false;
-                println!("Text now valid");
-            }
-        } else {
-            if !text_field.invalid {
-                text_field.invalid = true;
-                println!("Text now invalid");
+fn validate(
+    text: &Mut<Text>,
+    text_field: &mut Mut<TextField>,
+    cursor: &Mut<CursorTimer>,
+    mut commands: &mut Commands,
+    error_text: Option<Entity>,
+) {
+    if let Some(error_text) = error_text {
+        if let Some(validate) = &text_field.validate {
+            if validate(text_without_cursor(text.0.clone(), &cursor)) {
+                if text_field.invalid {
+                    text_field.invalid = false;
+                    commands.entity(error_text).insert(Visibility::Hidden);
+                }
+            } else {
+                if !text_field.invalid {
+                    text_field.invalid = true;
+                    commands.entity(error_text).insert(Visibility::Visible);
+                }
             }
         }
     }
