@@ -1,9 +1,11 @@
 use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
 use crate::builder::text_field_builder::TextFieldBuilder;
+use crate::edit::add_key_value_pairs::add_key_value_pairs;
 use crate::edit::colour_panel::setup_colour_edit_panel;
 use crate::edit::sources::{
-    BUTTON_BACKGROUND_COLOR_SOURCE, BUTTON_BORDER_COLOR_SOURCE, BUTTON_TEXT_SOURCE,
+    BUTTON_BACKGROUND_COLOR_SOURCE, BUTTON_BORDER_COLOR_SOURCE, BUTTON_BORDER_SIZE_SOURCE,
+    BUTTON_TEXT_SOURCE,
 };
 use crate::edit_plugin::text_edit_plugin::TextContentChange;
 use bevy::asset::AssetServer;
@@ -24,7 +26,9 @@ pub fn setup_button_edit_panel(
         .border(UiRect::all(Val::Px(5.0)), RED.into())
         .background_color(BLUE.into())
         .build_and_spawn(commands);
-    let top_label = make_text(commands, "Edit Button:");
+    let top_label = TextBuilder::new()
+        .content("Edit Button:")
+        .build_and_spawn(commands);
     let key_values_panel = setup_key_value_panel(commands);
     commands
         .entity(left_container)
@@ -39,27 +43,23 @@ fn setup_key_value_panel(commands: &mut Commands) -> Entity {
         .build_and_spawn(commands);
     let text = setup_text_edit_panel(commands, "Default", BUTTON_TEXT_SOURCE);
     let border_color_edit = setup_colour_edit_panel(commands, BUTTON_BORDER_COLOR_SOURCE);
+    let border_size_edit = setup_border_size_edit(commands);
     let background_color_edit = setup_colour_edit_panel(commands, BUTTON_BACKGROUND_COLOR_SOURCE);
     let pairs = &[
         ("Text:", text),
         ("Border colour:", border_color_edit),
+        ("Border size in Px:", border_size_edit),
         ("Background colour:", background_color_edit),
     ];
     add_key_value_pairs(pairs, key_values_panel, commands);
     key_values_panel
 }
 
-fn add_key_value_pairs(
-    pairs: &[(&str, Entity)],
-    key_values_panel: Entity,
-    commands: &mut Commands,
-) {
-    let mut children: Vec<Entity> = vec![];
-    pairs.iter().for_each(|(s, entity)| {
-        children.push(make_text(commands, s));
-        children.push(*entity);
-    });
-    commands.entity(key_values_panel).add_children(&children);
+fn setup_border_size_edit(commands: &mut Commands) -> Entity {
+    TextFieldBuilder::new()
+        .content("1.0")
+        .on_change_to_number(BUTTON_BORDER_SIZE_SOURCE)
+        .build_and_spawn(commands)
 }
 
 fn setup_text_edit_panel<S: Into<String>>(
@@ -85,8 +85,4 @@ fn setup_text_edit_panel<S: Into<String>>(
         .content(default_content)
         // .on_change(|id, s, commands| println!("on_change of {}: {}", id, s))
         .build_and_spawn(commands)
-}
-
-fn make_text(commands: &mut Commands, s: &str) -> Entity {
-    TextBuilder::new().content(s).build_and_spawn(commands)
 }

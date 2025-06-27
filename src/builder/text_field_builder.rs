@@ -1,4 +1,5 @@
 use crate::builder::node_builder::NodeBuilder;
+use crate::ui_plugin::number_plugin::NumberChangedEvent;
 use bevy::color::palettes::basic::TEAL;
 use bevy::prelude::*;
 use bevy::ui::widget::TextNodeFlags;
@@ -8,7 +9,6 @@ use std::sync::Arc;
 #[derive(Component, Default)]
 #[require(Interaction)]
 pub struct TextField {
-    pub id: String,
     pub on_change: Option<TextChangeCallback>,
 }
 
@@ -50,9 +50,17 @@ impl TextFieldBuilder {
         self.text_field.on_change = Some(Arc::new(callback));
         self
     }
-    pub fn id<S: Into<String>>(mut self, id: S) -> Self {
-        self.text_field.id = id.into();
-        self
+
+    pub fn on_change_to_number(self, source_id: impl Into<String>) -> Self {
+        let source_id = source_id.into();
+        self.on_change(move |content, commands| {
+            if let Ok(value) = content.parse::<f32>() {
+                let source_id = source_id.clone();
+                commands.queue(move |w: &mut World| {
+                    w.send_event(NumberChangedEvent { source_id, value });
+                });
+            }
+        })
     }
 
     pub fn content<S: Into<String>>(mut self, content: S) -> Self {

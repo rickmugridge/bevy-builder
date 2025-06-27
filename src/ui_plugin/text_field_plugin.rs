@@ -66,10 +66,6 @@ fn mouse_handling(
     >,
 ) {
     for (interaction, mut text, mut background_color, entity) in interaction_query.iter_mut() {
-        // println!(
-        //     "Button over TextField {:?} {:?}",
-        //     interaction, background_color
-        // );
         match *interaction {
             Interaction::Pressed => {
                 background_color.0 = RED.into();
@@ -116,21 +112,15 @@ fn keyboard_input(
 ) {
     let (mut text, text_field, mut cursor, entity) = edit_text.into_inner();
     for event in events.read() {
-        // Only trigger changes when the key is first pressed.
         if !event.state.is_pressed() {
             continue;
         }
-        // println!(
-        //     "KB: {:?}/{:?} for {} at {}",
-        //     &event.logical_key, &event.text, text.0, text_field.cursor_position
-        // );
-
         match (&event.logical_key, &event.text) {
             (Key::Enter, _) => {
                 text.remove(cursor.position);
                 commands.entity(entity).remove::<CursorTimer>();
             }
-            (Key::Backspace, _) => {
+            (Key::Backspace, _) if cursor.position > 0 => {
                 text.remove(cursor.position - 1);
                 cursor.position -= 1;
                 if let Some(on_change) = &text_field.on_change {

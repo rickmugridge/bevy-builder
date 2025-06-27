@@ -70,7 +70,7 @@ fn update_color(
         coloration_query.iter()
     {
         let color = Color::srgb(*red, *green, *blue);
-        println!("update_color {source_id} to {:?}", color);
+        // println!("update_color {source_id} to {:?}", color);
         let source_id = source_id.clone();
         commands.queue(move |w: &mut World| {
             w.send_event(ColorChangedEvent { source_id, color });
@@ -84,9 +84,9 @@ fn update_border_color(
     mut query: Query<(&mut BorderColor, &BorderColorChangeReactor)>,
 ) {
     for event in events.read() {
-        println!("Update border color: {}, {:?}", event.source_id, event.color);
+        // println!("Update border color: {}, {:?}", event.source_id, event.color);
         for (mut border_color, BorderColorChangeReactor { source_id }) in query.iter_mut() {
-            println!("Update border color: {source_id} and {}, {:?}", event.source_id, event.color);
+            // println!("Update border color: {source_id} and {}, {:?}", event.source_id, event.color);
             if event.source_id == *source_id {
                 border_color.0 = event.color;
             }
@@ -100,7 +100,7 @@ fn update_background_color(
 ) {
     for event in events.read() {
         for (mut background_color, BackgroundColorChangeReactor { source_id }) in query.iter_mut() {
-            println!("Update background color: {source_id} and {}, {:?}", event.source_id, event.color);
+            // println!("Update background color: {source_id} and {}, {:?}", event.source_id, event.color);
             if event.source_id == *source_id {
                 background_color.0 = event.color;
             }

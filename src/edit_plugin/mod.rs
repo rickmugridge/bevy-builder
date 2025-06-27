@@ -3,6 +3,7 @@ use crate::ui_plugin::color_plugin::ColorPlugin;
 use crate::ui_plugin::debounce_mouse_press_plugin::DebounceMousePressPlugin;
 use crate::ui_plugin::open_close_plugin::OpenClosePlugin;
 use bevy::app::{App, Plugin};
+use crate::ui_plugin::number_plugin::NumberPlugin;
 
 pub mod text_edit_plugin;
 
@@ -15,7 +16,7 @@ impl Plugin for EditPlugin {
             ColorPlugin,
             OpenClosePlugin,
             DebounceMousePressPlugin,
-            // BackgroundColorEditPlugin,
+            NumberPlugin,
         ));
     }
 }

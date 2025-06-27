@@ -1,15 +1,14 @@
 use crate::builder::button_builder::ButtonBuilder;
 use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
-use crate::edit::sources::{
-    BUTTON_BACKGROUND_COLOR_SOURCE, BUTTON_BORDER_COLOR_SOURCE, BUTTON_TEXT_SOURCE,
-};
+use crate::edit::sources::{BUTTON_BACKGROUND_COLOR_SOURCE, BUTTON_BORDER_COLOR_SOURCE, BUTTON_BORDER_SIZE_SOURCE, BUTTON_TEXT_SOURCE};
 use crate::ui_plugin::color_plugin::{BackgroundColorChangeReactor, BorderColorChangeReactor};
 use bevy::asset::AssetServer;
 use bevy::color::palettes::basic::YELLOW;
 use bevy::color::palettes::css::GREEN;
 use bevy::prelude::Val::Px;
 use bevy::prelude::*;
+use crate::ui_plugin::number_plugin::BorderSizeChangeReactor;
 
 pub fn setup_display_panel(commands: &mut Commands, _asset_server: &Res<AssetServer>) -> Entity {
     let border_node = NodeBuilder::new()
@@ -33,6 +32,9 @@ pub fn setup_display_panel(commands: &mut Commands, _asset_server: &Res<AssetSer
     commands.entity(button).insert((
         BorderColorChangeReactor {
             source_id: BUTTON_BORDER_COLOR_SOURCE.into(),
+        },
+        BorderSizeChangeReactor {
+            source_id: BUTTON_BORDER_SIZE_SOURCE.into(),
         },
         BackgroundColorChangeReactor {
             source_id: BUTTON_BACKGROUND_COLOR_SOURCE.into(),
