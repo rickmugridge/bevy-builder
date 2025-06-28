@@ -13,6 +13,7 @@ pub struct TextBuilder {
     shadow_color: Color,
     shadow_offset: Vec2,
     inner_node_bundle: NodeBundle,
+    outer_node_bundle: NodeBundle,
     text_content_reactor: Option<TextContentReactor>,
     text_color_reactor: Option<TextColorReactor>,
 }
@@ -28,6 +29,7 @@ impl TextBuilder {
             shadow_color: Color::NONE,
             shadow_offset: Vec2::ZERO,
             inner_node_bundle: NodeBundle::default(),
+            outer_node_bundle: NodeBundle::default(),
             text_content_reactor: None,
             text_color_reactor: None,
         }
@@ -45,6 +47,11 @@ impl TextBuilder {
 
     pub fn inner_node_bundle(mut self, inner_node_bundle: NodeBundle) -> Self {
         self.inner_node_bundle = inner_node_bundle;
+        self
+    }
+
+    pub fn outer_node_bundle(mut self, outer_node_bundle: NodeBundle) -> Self {
+        self.outer_node_bundle = outer_node_bundle;
         self
     }
 
@@ -80,6 +87,7 @@ impl TextBuilder {
     }
 
     pub fn build_and_spawn(self, commands: &mut Commands) -> Entity {
+        let outer = commands.spawn(self.outer_node_bundle).id();
         let text = (
             Text::new(self.content),
             self.font,
@@ -93,13 +101,14 @@ impl TextBuilder {
             ContentSize::default(),
             self.inner_node_bundle,
         );
-        let id = commands.spawn(text).id();
+        let text_entity = commands.spawn(text).id();
         if let Some(text_content_reactor) = self.text_content_reactor {
-            commands.entity(id).insert(text_content_reactor);       
+            commands.entity(text_entity).insert(text_content_reactor);
         }
        if let Some(text_color_reactor) = self.text_color_reactor {
-            commands.entity(id).insert(text_color_reactor);       
+            commands.entity(text_entity).insert(text_color_reactor);
         }
-        id
+        commands.entity(outer).add_child(text_entity);
+        outer
     }
 }

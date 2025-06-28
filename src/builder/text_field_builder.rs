@@ -26,7 +26,6 @@ pub struct TextFieldBuilder {
     linebreak: LineBreak,
     shadow_color: Color,
     shadow_offset: Vec2,
-    border_color: BorderColor,
     node_bundle: NodeBundle,
 }
 
@@ -41,7 +40,6 @@ impl TextFieldBuilder {
             linebreak: LineBreak::default(),
             shadow_color: Color::NONE,
             shadow_offset: Vec2::ZERO,
-            border_color: BorderColor::from(Color::WHITE),
             node_bundle: NodeBundle::default(),
         }
     }
@@ -114,17 +112,11 @@ impl TextFieldBuilder {
         self.shadow_offset = offset;
         self
     }
-
-    pub fn border_color(mut self, border_color: Color) -> Self {
-        self.border_color = BorderColor::from(border_color);
-        self
-    }
-
+    
     pub fn build_and_spawn(self, commands: &mut Commands) -> Entity {
         let text = (
             Text::new(self.content),
             self.text_field,
-            // self.border_color,
             self.font,
             TextColor(self.color),
             TextLayout::new(self.justify_text, self.linebreak),
@@ -134,7 +126,6 @@ impl TextFieldBuilder {
             },
             TextNodeFlags::default(),
             ContentSize::default(),
-            // BackgroundColor(Color::WHITE), // This has no impact because text_field_hover() sets it as WHITE on first, auto, Update
             self.node_bundle,
         );
         let border_node = NodeBuilder::new()
