@@ -1,4 +1,4 @@
-use crate::builder::node_builder::NodeBuilder;
+use crate::builder::node_builder::{NodeBuilder, NodeBundle};
 use crate::ui_plugin::number_plugin::NumberChangedEvent;
 use bevy::color::palettes::basic::{RED, TEAL};
 use bevy::prelude::*;
@@ -27,7 +27,7 @@ pub struct TextFieldBuilder {
     shadow_color: Color,
     shadow_offset: Vec2,
     border_color: BorderColor,
-    node: Node,
+    node_bundle: NodeBundle,
 }
 
 impl TextFieldBuilder {
@@ -42,7 +42,7 @@ impl TextFieldBuilder {
             shadow_color: Color::NONE,
             shadow_offset: Vec2::ZERO,
             border_color: BorderColor::from(Color::WHITE),
-            node: Node::default(),
+            node_bundle: NodeBundle::default(),
         }
     }
 
@@ -89,8 +89,8 @@ impl TextFieldBuilder {
         self
     }
 
-    pub fn node(mut self, node: Node) -> Self {
-        self.node = node;
+    pub fn node(mut self, node_bundle: NodeBundle) -> Self {
+        self.node_bundle = node_bundle;
         self
     }
 
@@ -124,7 +124,7 @@ impl TextFieldBuilder {
         let text = (
             Text::new(self.content),
             self.text_field,
-            self.border_color,
+            // self.border_color,
             self.font,
             TextColor(self.color),
             TextLayout::new(self.justify_text, self.linebreak),
@@ -134,8 +134,8 @@ impl TextFieldBuilder {
             },
             TextNodeFlags::default(),
             ContentSize::default(),
-            BackgroundColor(Color::WHITE), // This has no impact because text_field_hover() sets it as WHITE on first, auto, Update
-            self.node,
+            // BackgroundColor(Color::WHITE), // This has no impact because text_field_hover() sets it as WHITE on first, auto, Update
+            self.node_bundle,
         );
         let border_node = NodeBuilder::new()
             .border_of(Val::Px(1.), TEAL.into())
