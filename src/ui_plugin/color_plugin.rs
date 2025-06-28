@@ -17,13 +17,27 @@ pub struct ColorChangedEvent {
 }
 
 #[derive(Component, Debug)]
-pub struct BackgroundColorChangeReactor {
-    pub source_id: String,
+pub enum BackgroundColorChangeReactor {
+    Active { source_id: String },
+    Inactive,
+}
+
+impl Default for BackgroundColorChangeReactor {
+    fn default() -> Self {
+        Self::Inactive
+    }
 }
 
 #[derive(Component, Debug)]
-pub struct BorderColorChangeReactor {
-    pub source_id: String,
+pub enum BorderColorChangeReactor {
+    Active { source_id: String },
+    Inactive,
+}
+
+impl Default for BorderColorChangeReactor {
+    fn default() -> Self {
+        Self::Inactive
+    }
 }
 
 #[derive(Component, Debug)]
@@ -85,10 +99,12 @@ fn update_border_color(
 ) {
     for event in events.read() {
         // println!("Update border color: {}, {:?}", event.source_id, event.color);
-        for (mut border_color, BorderColorChangeReactor { source_id }) in query.iter_mut() {
+        for (mut border_color, reactor) in query.iter_mut() {
             // println!("Update border color: {source_id} and {}, {:?}", event.source_id, event.color);
-            if event.source_id == *source_id {
-                border_color.0 = event.color;
+            if let BorderColorChangeReactor::Active { source_id } = reactor {
+                if event.source_id == *source_id {
+                    border_color.0 = event.color;
+                }
             }
         }
     }
@@ -99,10 +115,12 @@ fn update_background_color(
     mut query: Query<(&mut BackgroundColor, &BackgroundColorChangeReactor)>,
 ) {
     for event in events.read() {
-        for (mut background_color, BackgroundColorChangeReactor { source_id }) in query.iter_mut() {
+        for (mut background_color, reactor) in query.iter_mut() {
             // println!("Update background color: {source_id} and {}, {:?}", event.source_id, event.color);
-            if event.source_id == *source_id {
-                background_color.0 = event.color;
+            if let BackgroundColorChangeReactor::Active { source_id } = reactor {
+                if event.source_id == *source_id {
+                    background_color.0 = event.color;
+                }
             }
         }
     }

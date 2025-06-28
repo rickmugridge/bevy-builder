@@ -9,22 +9,19 @@ pub struct NodeBundle {
     pub node: Node,
     pub border_color: BorderColor,
     pub background_color: BackgroundColor,
+    background_color_change_reactor: BackgroundColorChangeReactor,
+    border_color_change_reactor: BorderColorChangeReactor,
+    border_size_change_reactor: BorderSizeChangeReactor,
 }
 
 pub struct NodeBuilder {
     bundle: NodeBundle,
-    border_color_change_reactor: Option<BorderColorChangeReactor>,
-    border_size_change_reactor: Option<BorderSizeChangeReactor>,
-    background_color_change_reactor: Option<BackgroundColorChangeReactor>,
 }
 
 impl Default for NodeBuilder {
     fn default() -> Self {
         Self {
             bundle: NodeBundle::default(),
-            border_color_change_reactor: None,
-            border_size_change_reactor: None,
-            background_color_change_reactor: None,
         }
     }
 }
@@ -246,23 +243,23 @@ impl NodeBuilder {
     }
 
     pub fn border_color_change_reactor(mut self, source_id: &str) -> Self {
-        self.border_color_change_reactor = Some(BorderColorChangeReactor {
+        self.bundle.border_color_change_reactor = BorderColorChangeReactor::Active {
             source_id: source_id.into(),
-        });
+        };
         self
     }
 
     pub fn border_size_change_reactor(mut self, source_id: &str) -> Self {
-        self.border_size_change_reactor = Some(BorderSizeChangeReactor {
+        self.bundle.border_size_change_reactor = BorderSizeChangeReactor::Active {
             source_id: source_id.into(),
-        });
+        };
         self
     }
 
     pub fn background_color_change_reactor(mut self, source_id: &str) -> Self {
-        self.background_color_change_reactor = Some(BackgroundColorChangeReactor {
+        self.bundle.background_color_change_reactor = BackgroundColorChangeReactor::Active {
             source_id: source_id.into(),
-        });
+        };
         self
     }
 
@@ -271,19 +268,6 @@ impl NodeBuilder {
     }
 
     pub fn build_and_spawn(self, commands: &mut Commands) -> Entity {
-        let entity = commands.spawn(self.bundle).id();
-        if let Some(border_color_change_reactor) = self.border_color_change_reactor {
-            commands.entity(entity).insert(border_color_change_reactor);
-        }
-        if let Some(border_size_change_reactor) = self.border_size_change_reactor {
-            commands.entity(entity).insert(border_size_change_reactor);
-        }
-        if let Some(background_color_change_reactor) = self.background_color_change_reactor {
-            commands
-                .entity(entity)
-                .insert(background_color_change_reactor);
-        }
-
-        entity
+        commands.spawn(self.bundle).id()
     }
 }

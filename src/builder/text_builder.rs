@@ -4,6 +4,18 @@ use bevy::ui::ContentSize;
 use bevy::ui::widget::TextNodeFlags;
 use crate::builder::node_builder::NodeBundle;
 
+#[derive(Bundle, Default)]
+pub struct TextBundle {
+    pub text: Text,
+    pub font: TextFont,
+    pub color: TextColor,
+    pub layout: TextLayout,
+    pub shadow: TextShadow,
+    pub flags: TextNodeFlags,
+    pub content_size: ContentSize,
+    pub inner_node_bundle: NodeBundle,
+}
+
 pub struct TextBuilder {
     content: String,
     font: TextFont,

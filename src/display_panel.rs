@@ -19,16 +19,16 @@ pub fn setup_display_panel(commands: &mut Commands, _asset_server: &Res<AssetSer
         .justify_content(JustifyContent::Center)
         .align_items(AlignItems::Center)
         .border(UiRect::all(Val::Px(2.0)), GREEN.into())
-        .build();
+        .border_color_change_reactor(BUTTON_BORDER_COLOR_SOURCE)
+        .border_size_change_reactor(BUTTON_BORDER_SIZE_SOURCE)
+        .background_color_change_reactor(BUTTON_BACKGROUND_COLOR_SOURCE)
+       .build();
     let button = ButtonBuilder::new(
         button_node,
         TextBuilder::new()
             .text_content_reactor(BUTTON_TEXT_SOURCE)
             .build_and_spawn(commands),
     )
-        .border_color_change_reactor(BUTTON_BORDER_COLOR_SOURCE)
-        .border_size_change_reactor(BUTTON_BORDER_SIZE_SOURCE)
-        .background_color_change_reactor(BUTTON_BACKGROUND_COLOR_SOURCE)
     .build_and_spawn(commands);
     commands.entity(border_node).add_child(button);
     border_node

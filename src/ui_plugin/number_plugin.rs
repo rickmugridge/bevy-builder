@@ -8,8 +8,15 @@ pub struct NumberChangedEvent {
 }
 
 #[derive(Component, Debug)]
-pub struct BorderSizeChangeReactor {
-    pub source_id: String,
+pub enum BorderSizeChangeReactor {
+    Active { source_id: String },
+    Inactive,
+}
+
+impl Default for BorderSizeChangeReactor {
+    fn default() -> Self {
+        Self::Inactive
+    }
 }
 
 pub struct NumberPlugin;
@@ -26,9 +33,11 @@ fn update_border_size(
     mut query: Query<(&mut Node, &BorderSizeChangeReactor)>,
 ) {
     for event in events.read() {
-        for (mut node, BorderSizeChangeReactor { source_id }) in query.iter_mut() {
-            if event.source_id == *source_id {
-                node.border = UiRect::all(Val::Px(event.value));
+        for (mut node, reactor) in query.iter_mut() {
+            if let BorderSizeChangeReactor:: Active { source_id } = reactor {
+                if event.source_id == *source_id {
+                    node.border = UiRect::all(Val::Px(event.value));
+                }
             }
         }
     }

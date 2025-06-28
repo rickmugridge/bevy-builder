@@ -2,17 +2,14 @@ use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
 use crate::builder::text_field_builder::TextFieldBuilder;
 use crate::ui_plugin::color_plugin::{
-    BackgroundColorChangeReactor, ColorValueChanged, Coloration, EditBlue, EditGreen, EditRed,
+    ColorValueChanged, Coloration, EditBlue, EditGreen, EditRed,
 };
 use crate::ui_plugin::open_close_plugin::{OpenClose, OpenCloseReactor};
-use bevy::color::Color;
 use bevy::color::palettes::basic::{GREEN, WHITE};
+use bevy::color::Color;
 use bevy::prelude::{Commands, Display, Entity, GridTrack, Interaction, Val};
 
-pub fn setup_colour_edit_panel(
-    commands: &mut Commands,
-    color_source_id: &str
-) -> Entity {
+pub fn setup_colour_edit_panel(commands: &mut Commands, color_source_id: &str) -> Entity {
     let mut open_close_source_id = color_source_id.to_string();
     open_close_source_id.push_str("_open_close");
     let rgb_entity = commands
@@ -109,15 +106,9 @@ fn make_color_sample(commands: &mut Commands, source_id: &str) -> Entity {
     let color_box = NodeBuilder::new()
         .height(Val::Px(25.0))
         .background_color(Color::BLACK)
+        .background_color_change_reactor(source_id)
         .build();
-    commands
-        .spawn((
-            color_box,
-            BackgroundColorChangeReactor {
-                source_id: source_id.into(),
-            },
-        ))
-        .id()
+    commands.spawn(color_box).id()
 }
 
 fn coloration<F>(commands: &mut Commands, on_change: F) -> Entity
