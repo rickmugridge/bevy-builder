@@ -1,24 +1,22 @@
-use crate::builder::node_builder::NodeBundle;
+use crate::builder::button_builder::ButtonBuilder;
+use crate::builder::node_builder::{NodeBuilder, NodeBundle};
+use crate::builder::text_builder::TextBuilder;
 use bevy::prelude::{Commands, Component, Entity};
 use bevy::ui::Display;
 
 #[derive(Component, Default)]
-pub struct Menu {
+pub struct Tab {} // todo manage state of which tab is selected
 
-}
-
-pub struct MenuBuilder {
+pub struct TabBuilder {
     menus: Vec<(String, Entity)>,
     node_bundle: NodeBundle,
-    columnar: bool,
 }
 
-impl MenuBuilder {
+impl TabBuilder {
     pub fn new() -> Self {
         Self {
             menus: Vec::new(),
             node_bundle: NodeBundle::default(),
-            columnar: true,
         }
     }
 
@@ -32,11 +30,6 @@ impl MenuBuilder {
         self
     }
 
-    pub fn columnar(mut self, columnar:bool) -> Self {
-        self.columnar = columnar;
-        self
-    }
-
     pub fn spawn(self, commands: &mut Commands) -> Entity {
         let container = self.make_container(commands);
         container
@@ -44,11 +37,18 @@ impl MenuBuilder {
 
     fn make_container(mut self, commands: &mut Commands) -> Entity {
         self.node_bundle.node.display = Display::Grid;
-        if self.columnar {
-        } else {
-
-        }
-        commands
-            .spawn(self.node_bundle)
-            .id()  }
+        let node = commands.spawn(self.node_bundle).id();
+        let mut children: Vec<Entity> = Vec::new();
+        self.menus.iter().for_each(|(text, entity)| {
+            let button = ButtonBuilder::new(
+                NodeBuilder::new().bundle(),
+                TextBuilder::new().content(text).spawn(commands),
+            )
+            .spawn(commands);
+            children.push(button);
+            children.push(*entity);
+        });
+        commands.entity(node).add_children(&children);
+        node
+    }
 }
