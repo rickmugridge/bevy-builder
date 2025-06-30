@@ -22,7 +22,7 @@
 //         self.image
 //     }
 // 
-//     pub fn build_and_spawn(self, commands: &mut Commands) -> Entity {
+//     pub fn spawn(self, commands: &mut Commands) -> Entity {
 //         commands.spawn(self.image).id()
 //     }
 // }

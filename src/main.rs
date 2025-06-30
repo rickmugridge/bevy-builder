@@ -48,7 +48,7 @@ fn setup_panels(mut commands: Commands, _asset_server: Res<AssetServer>) {
         .justify_content(JustifyContent::Center)
         .column(vec![GridTrack::flex(1.0), GridTrack::flex(1.0)])
         .border(UiRect::all(Val::Px(5.0)), SILVER.into())
-        .build_and_spawn(&mut commands);
+        .spawn(&mut commands);
     let edit_panel = setup_edit_panel(&mut commands, &_asset_server);
     let display_panel = setup_display_panel(&mut commands, &_asset_server);
     commands

@@ -25,10 +25,10 @@ pub fn setup_button_edit_panel(
         .row_gap(Val::Px(5.0))
         .border(UiRect::all(Val::Px(5.0)), RED.into())
         .background_color(BLUE.into())
-        .build_and_spawn(commands);
+        .spawn(commands);
     let top_label = TextBuilder::new()
         .content("Edit Button:")
-        .build_and_spawn(commands);
+        .spawn(commands);
     let key_values_panel = setup_key_value_panel(commands);
     commands
         .entity(left_container)
@@ -40,7 +40,7 @@ fn setup_key_value_panel(commands: &mut Commands) -> Entity {
     let key_values_panel = NodeBuilder::new()
         .key_value_pairs()
         .background_color(GREEN.into())
-        .build_and_spawn(commands);
+        .spawn(commands);
     let text = setup_text_edit_panel(commands, "Default", BUTTON_TEXT_SOURCE);
     let border_color_edit = setup_colour_edit_panel(commands, BUTTON_BORDER_COLOR_SOURCE);
     let border_size_edit = setup_border_size_edit(commands);
@@ -59,7 +59,7 @@ fn setup_border_size_edit(commands: &mut Commands) -> Entity {
     TextFieldBuilder::new()
         .content("1.0")
         .on_change_to_number(BUTTON_BORDER_SIZE_SOURCE)
-        .build_and_spawn(commands)
+        .spawn(commands)
 }
 
 fn setup_text_edit_panel<S: Into<String>>(
@@ -68,7 +68,7 @@ fn setup_text_edit_panel<S: Into<String>>(
     source_id: &'static str,
 ) -> Entity {
     TextFieldBuilder::new()
-        .node(NodeBuilder::new().text_field_node().build())
+        .node(NodeBuilder::new().text_field_node().bundle())
         .on_change(|button_text, commands| {
             commands.queue(|w: &mut World| {
                 println!(
@@ -84,5 +84,5 @@ fn setup_text_edit_panel<S: Into<String>>(
         })
         .content(default_content)
         // .on_change(|id, s, commands| println!("on_change of {}: {}", id, s))
-        .build_and_spawn(commands)
+        .spawn(commands)
 }

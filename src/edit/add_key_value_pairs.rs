@@ -8,7 +8,7 @@ pub fn add_key_value_pairs(
 ) {
     let mut children: Vec<Entity> = vec![];
     pairs.iter().for_each(|(s, entity)| {
-        children.push(TextBuilder::new().content(*s).build_and_spawn(commands));
+        children.push(TextBuilder::new().content(*s).spawn(commands));
         children.push(*entity);
     });
     commands.entity(key_values_panel).add_children(&children);

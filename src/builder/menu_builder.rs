@@ -37,7 +37,7 @@ impl MenuBuilder {
         self
     }
 
-    pub fn build_and_spawn(self, commands: &mut Commands) -> Entity {
+    pub fn spawn(self, commands: &mut Commands) -> Entity {
         let container = self.make_container(commands);
         container
     }

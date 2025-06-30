@@ -263,11 +263,11 @@ impl NodeBuilder {
         self
     }
 
-    pub fn build(self) -> NodeBundle {
+    pub fn bundle(self) -> NodeBundle {
         self.bundle
     }
 
-    pub fn build_and_spawn(self, commands: &mut Commands) -> Entity {
+    pub fn spawn(self, commands: &mut Commands) -> Entity {
         commands.spawn(self.bundle).id()
     }
 }

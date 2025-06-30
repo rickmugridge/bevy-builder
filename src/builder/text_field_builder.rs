@@ -113,7 +113,7 @@ impl TextFieldBuilder {
         self
     }
     
-    pub fn build_and_spawn(self, commands: &mut Commands) -> Entity {
+    pub fn spawn(self, commands: &mut Commands) -> Entity {
         let text = (
             Text::new(self.content),
             self.text_field,
@@ -131,7 +131,7 @@ impl TextFieldBuilder {
         let border_node = NodeBuilder::new()
             .border_of(Val::Px(1.), TEAL.into())
             .background_color(Color::WHITE)
-            .build_and_spawn(commands);
+            .spawn(commands);
         let text_entity = commands.spawn(text).id();
         let error_text = commands
             .spawn((

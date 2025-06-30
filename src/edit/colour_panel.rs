@@ -25,7 +25,7 @@ pub fn setup_colour_edit_panel(commands: &mut Commands, color_source_id: &str) -
     let key_values_panel = NodeBuilder::new()
         .key_value_pairs()
         .background_color(GREEN.into())
-        .build_and_spawn(commands);
+        .spawn(commands);
     let red_label = make_text(commands, "Red:");
     let red = coloration(commands, move |value, commands| {
         // println!("Update EditRed({value})");
@@ -57,7 +57,7 @@ pub fn setup_colour_edit_panel(commands: &mut Commands, color_source_id: &str) -
         });
     let outer_panel = NodeBuilder::new()
         .row(vec![GridTrack::min_content(), GridTrack::min_content()])
-        .build_and_spawn(commands);
+        .spawn(commands);
     let colour_panel = make_colour_panel(commands, color_source_id, open_close_source_id);
     commands
         .entity(outer_panel)
@@ -73,7 +73,7 @@ fn make_colour_panel(
     let color_box = make_color_sample(commands, color_source_id);
     let colour_panel = NodeBuilder::new()
         .column(vec![GridTrack::min_content(), GridTrack::flex(1.0)])
-        .build_and_spawn(commands);
+        .spawn(commands);
     let plus_label = make_open_label(commands, open_source_id.into());
     commands
         .entity(colour_panel)
@@ -82,7 +82,7 @@ fn make_colour_panel(
 }
 
 fn make_open_label(commands: &mut Commands, open_source_id: String) -> Entity {
-    let text = TextBuilder::new().content("+").build_and_spawn(commands);
+    let text = TextBuilder::new().content("+").spawn(commands);
     commands.entity(text).insert((
         Interaction::default(),
         OpenClose {
@@ -93,13 +93,13 @@ fn make_open_label(commands: &mut Commands, open_source_id: String) -> Entity {
     let panel = NodeBuilder::new()
         .background_color(GREEN.into())
         .border_of(Val::Px(1.), WHITE.into())
-        .build_and_spawn(commands);
+        .spawn(commands);
     commands.entity(panel).add_children(&[text]);
     panel
 }
 
 fn make_text(commands: &mut Commands, s: &str) -> Entity {
-    TextBuilder::new().content(s).build_and_spawn(commands)
+    TextBuilder::new().content(s).spawn(commands)
 }
 
 fn make_color_sample(commands: &mut Commands, source_id: &str) -> Entity {
@@ -107,7 +107,7 @@ fn make_color_sample(commands: &mut Commands, source_id: &str) -> Entity {
         .height(Val::Px(25.0))
         .background_color(Color::BLACK)
         .background_color_change_reactor(source_id)
-        .build();
+        .bundle();
     commands.spawn(color_box).id()
 }
 
@@ -116,7 +116,7 @@ where
     F: Fn(f32, &mut Commands) + Send + Sync + 'static,
 {
     TextFieldBuilder::new()
-        .node(NodeBuilder::new().text_field_node().build())
+        .node(NodeBuilder::new().text_field_node().bundle())
         .content("0.0")
         .on_change(move |button_text, commands| {
             if let Ok(value) = button_text.parse::<f32>() {
@@ -125,5 +125,5 @@ where
             }
         })
         .validate_is_number()
-        .build_and_spawn(commands)
+        .spawn(commands)
 }

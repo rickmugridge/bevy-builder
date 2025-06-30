@@ -80,7 +80,7 @@ impl TextBuilder {
         self
     }
 
-    pub fn build_and_spawn(self, commands: &mut Commands) -> Entity {
+    pub fn spawn(self, commands: &mut Commands) -> Entity {
         let outer = commands.spawn(self.outer_node_bundle).id();
         let text_entity = commands.spawn(self.bundle).id();
         commands.entity(outer).add_child(text_entity);

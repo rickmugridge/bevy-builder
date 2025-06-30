@@ -22,13 +22,13 @@ impl ButtonBuilder {
         self.border_radius = border_radius;
         self
     }
-    
+
    pub fn interaction(mut self, interaction: Interaction) -> Self {
         self.interaction = interaction;
         self
     }
 
-    pub fn build_and_spawn(self, commands: &mut Commands) -> Entity {
+    pub fn spawn(self, commands: &mut Commands) -> Entity {
         let button = (
             Button,
             self.node_bundle,

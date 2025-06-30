@@ -13,7 +13,7 @@ pub fn setup_display_panel(commands: &mut Commands, _asset_server: &Res<AssetSer
         .border_of(Px(3.), YELLOW.into())
         .height(Val::Percent(100.))
         .row(vec![GridTrack::min_content()])
-        .build_and_spawn(commands);
+        .spawn(commands);
 
     let button_node = NodeBuilder::new()
         .justify_content(JustifyContent::Center)
@@ -22,15 +22,15 @@ pub fn setup_display_panel(commands: &mut Commands, _asset_server: &Res<AssetSer
         .border_color_change_reactor(BUTTON_BORDER_COLOR_SOURCE)
         .border_size_change_reactor(BUTTON_BORDER_SIZE_SOURCE)
         .background_color_change_reactor(BUTTON_BACKGROUND_COLOR_SOURCE)
-       .build();
+       .bundle();
     let button = ButtonBuilder::new(
         button_node,
         TextBuilder::new()
             .content("Default")
             .text_content_reactor(BUTTON_TEXT_SOURCE)
-            .build_and_spawn(commands),
+            .spawn(commands),
     )
-    .build_and_spawn(commands);
+    .spawn(commands);
     commands.entity(border_node).add_child(button);
     border_node
 }
