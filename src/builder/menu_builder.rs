@@ -4,7 +4,7 @@ use bevy::ui::Display;
 
 #[derive(Component, Default)]
 pub struct Menu {
-    
+
 }
 
 pub struct MenuBuilder {
@@ -21,7 +21,7 @@ impl MenuBuilder {
             columnar: true,
         }
     }
-    
+
     pub fn add_menus(mut self, menus: Vec<(String, Entity)>) -> Self {
         self.menus = menus;
         self
@@ -31,7 +31,7 @@ impl MenuBuilder {
         self.node_bundle = node;
         self
     }
-    
+
     pub fn columnar(mut self, columnar:bool) -> Self {
         self.columnar = columnar;
         self
@@ -41,12 +41,12 @@ impl MenuBuilder {
         let container = self.make_container(commands);
         container
     }
-    
+
     fn make_container(mut self, commands: &mut Commands) -> Entity {
         self.node_bundle.node.display = Display::Grid;
         if self.columnar {
         } else {
-            
+
         }
         commands
             .spawn(self.node_bundle)

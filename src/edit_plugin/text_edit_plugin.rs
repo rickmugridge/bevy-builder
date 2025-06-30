@@ -19,26 +19,32 @@ pub struct TextContentChange {
 }
 
 #[derive(Debug, Component)]
-pub struct TextContentReactor {
-    pub source_id: String,
+pub enum TextContentReactor {
+    Active { source_id: String },
+    Inactive,
+}
+
+impl Default for TextContentReactor {
+    fn default() -> Self {
+        Self::Inactive
+    }
 }
 
 fn react_to_content_update(
     mut events: EventReader<TextContentChange>,
     mut text_query: Query<(&mut Text, &TextContentReactor)>,
 ) {
-    for TextContentChange {
-        source_id,
-        contents,
-    } in events.read()
+    for event in events.read()
     {
         for (mut text, reactor) in text_query.iter_mut() {
             println!(
-                "Event received for Text: {} with content: {}",
-                source_id, contents
+                "Event received for  {:?}",
+                event
             );
-            if *source_id == reactor.source_id {
-                text.0 = contents.clone();
+            if let TextContentReactor::Active{source_id} = reactor {
+                if *event.source_id == *source_id {
+                    text.0 = event.contents.clone();
+                }
             }
         }
     }
@@ -51,22 +57,31 @@ pub struct TextColorChange {
 }
 
 #[derive(Debug, Component)]
-pub struct TextColorReactor {
-    pub source_id: String,
+pub enum TextColorReactor {
+    Active { source_id: String },
+    Inactive,
+}
+
+impl Default for TextColorReactor {
+    fn default() -> Self {
+        Self::Inactive
+    }
 }
 
 fn react_to_colour_update(
     mut events: EventReader<TextColorChange>,
     mut text_query: Query<(&mut TextColor, &TextColorReactor)>,
 ) {
-    for TextColorChange { source_id, color } in events.read() {
+    for event in events.read() {
         for (mut text_color, reactor) in text_query.iter_mut() {
             println!(
-                "Event received for Text: {} with colour: {:?}",
-                source_id, color
+                "Event received for  {:?}",
+                event
             );
-            if *source_id == reactor.source_id {
-                text_color.0 = *color;
+            if let TextColorReactor::Active{source_id} = reactor {
+                if *event.source_id == *source_id {
+                    text_color.0 = event.color;
+                }
             }
         }
     }

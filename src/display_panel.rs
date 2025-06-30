@@ -26,6 +26,7 @@ pub fn setup_display_panel(commands: &mut Commands, _asset_server: &Res<AssetSer
     let button = ButtonBuilder::new(
         button_node,
         TextBuilder::new()
+            .content("Default")
             .text_content_reactor(BUTTON_TEXT_SOURCE)
             .build_and_spawn(commands),
     )
