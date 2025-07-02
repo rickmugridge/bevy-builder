@@ -1,5 +1,5 @@
 use crate::builder::button_builder::ButtonBuilder;
-use crate::builder::node_builder::{NodeBuilder, NodeBundle};
+use crate::builder::node_builder::NodeBundle;
 use crate::builder::text_builder::TextBuilder;
 use bevy::prelude::{Commands, Component, Entity};
 use bevy::ui::Display;
@@ -40,11 +40,8 @@ impl TabBuilder {
         let node = commands.spawn(self.node_bundle).id();
         let mut children: Vec<Entity> = Vec::new();
         self.menus.iter().for_each(|(text, entity)| {
-            let button = ButtonBuilder::new(
-                NodeBuilder::new().bundle(),
-                TextBuilder::new().content(text).spawn(commands),
-            )
-            .spawn(commands);
+            let button = ButtonBuilder::new(TextBuilder::new().content(text).spawn(commands))
+                .spawn(commands);
             children.push(button);
             children.push(*entity);
         });

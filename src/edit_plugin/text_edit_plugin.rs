@@ -37,10 +37,10 @@ fn react_to_content_update(
     for event in events.read()
     {
         for (mut text, reactor) in text_query.iter_mut() {
-            println!(
-                "Event received for  {:?}",
-                event
-            );
+            // println!(
+            //     "Event received for  {:?}",
+            //     event
+            // );
             if let TextContentReactor::Active{source_id} = reactor {
                 if *event.source_id == *source_id {
                     text.0 = event.contents.clone();

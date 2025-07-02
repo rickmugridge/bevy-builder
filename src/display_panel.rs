@@ -1,7 +1,10 @@
 use crate::builder::button_builder::ButtonBuilder;
 use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
-use crate::edit::sources::{BUTTON_BACKGROUND_COLOR_SOURCE, BUTTON_BORDER_COLOR_SOURCE, BUTTON_BORDER_SIZE_SOURCE, BUTTON_TEXT_SOURCE};
+use crate::edit::sources::{
+    BUTTON_BACKGROUND_COLOR_SOURCE, BUTTON_BORDER_COLOR_SOURCE, BUTTON_BORDER_SIZE_SOURCE,
+    BUTTON_TEXT_SOURCE,
+};
 use bevy::asset::AssetServer;
 use bevy::color::palettes::basic::YELLOW;
 use bevy::color::palettes::css::GREEN;
@@ -22,15 +25,14 @@ pub fn setup_display_panel(commands: &mut Commands, _asset_server: &Res<AssetSer
         .border_color_change_reactor(BUTTON_BORDER_COLOR_SOURCE)
         .border_size_change_reactor(BUTTON_BORDER_SIZE_SOURCE)
         .background_color_change_reactor(BUTTON_BACKGROUND_COLOR_SOURCE)
-       .bundle();
-    let button = ButtonBuilder::new(
-        button_node,
-        TextBuilder::new()
-            .content("Default")
-            .text_content_reactor(BUTTON_TEXT_SOURCE)
-            .spawn(commands),
-    )
-    .spawn(commands);
+        .bundle();
+    let text = TextBuilder::new()
+        .content("Default")
+        .text_content_reactor(BUTTON_TEXT_SOURCE)
+        .spawn(commands);
+    let button = ButtonBuilder::new(text)
+        .node_bundle(button_node)
+        .spawn(commands);
     commands.entity(border_node).add_child(button);
     border_node
 }
