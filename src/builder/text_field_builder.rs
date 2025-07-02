@@ -1,9 +1,8 @@
 use crate::builder::node_builder::{NodeBuilder, NodeBundle};
+use crate::builder::text_builder::{TextBuilder, TextBundle};
 use crate::ui_plugin::number_plugin::NumberChangedEvent;
 use bevy::color::palettes::basic::{RED, TEAL};
 use bevy::prelude::*;
-use bevy::ui::ContentSize;
-use bevy::ui::widget::TextNodeFlags;
 use std::sync::Arc;
 
 #[derive(Component, Default)]
@@ -19,28 +18,24 @@ type TextValidationCallback = Arc<dyn Fn(String) -> Option<String> + Send + Sync
 
 pub struct TextFieldBuilder {
     text_field: TextField,
-    content: String,
-    font: TextFont,
-    color: Color,
-    justify_text: JustifyText,
-    linebreak: LineBreak,
-    shadow_color: Color,
-    shadow_offset: Vec2,
-    node_bundle: NodeBundle,
+    text_bundle: TextBundle,
+    border_node_bundle: NodeBundle,
+    error_text_bundle: TextBundle,
 }
 
 impl TextFieldBuilder {
     pub fn new() -> Self {
         Self {
             text_field: TextField::default(),
-            content: "Default".to_string(),
-            font: TextFont::default(),
-            color: Color::BLACK,
-            justify_text: JustifyText::default(),
-            linebreak: LineBreak::default(),
-            shadow_color: Color::NONE,
-            shadow_offset: Vec2::ZERO,
-            node_bundle: NodeBundle::default(),
+            text_bundle: TextBundle::default(),
+            border_node_bundle: NodeBuilder::new()
+                .border_of(Val::Px(1.), TEAL.into())
+                .background_color(Color::WHITE)
+                .bundle(),
+            error_text_bundle: TextBuilder::new()
+                .content("Error")
+                .color(RED.into())
+                .bundle(),
         }
     }
 
@@ -77,68 +72,16 @@ impl TextFieldBuilder {
         self.validate(|content| content.parse::<f32>().err().map(|_| "Not a number".into()))
     }
 
-    pub fn content<S: Into<String>>(mut self, content: S) -> Self {
-        self.content = content.into();
+    pub fn text_bundle(mut self, text_bundle: TextBundle) -> Self {
+        self.text_bundle = text_bundle;
         self
     }
 
-    pub fn font(mut self, font: TextFont) -> Self {
-        self.font = font;
-        self
-    }
-
-    pub fn node(mut self, node_bundle: NodeBundle) -> Self {
-        self.node_bundle = node_bundle;
-        self
-    }
-
-    pub fn color(mut self, color: Color) -> Self {
-        self.color = color;
-        self
-    }
-
-    pub fn justify_text(mut self, justify_text: JustifyText) -> Self {
-        self.justify_text = justify_text;
-        self
-    }
-
-    pub fn linebreak(mut self, linebreak: LineBreak) -> Self {
-        self.linebreak = linebreak;
-        self
-    }
-
-    pub fn shadow(mut self, color: Color, offset: Vec2) -> Self {
-        self.shadow_color = color;
-        self.shadow_offset = offset;
-        self
-    }
-    
     pub fn spawn(self, commands: &mut Commands) -> Entity {
-        let text = (
-            Text::new(self.content),
-            self.text_field,
-            self.font,
-            TextColor(self.color),
-            TextLayout::new(self.justify_text, self.linebreak),
-            TextShadow {
-                color: self.shadow_color,
-                offset: self.shadow_offset,
-            },
-            TextNodeFlags::default(),
-            ContentSize::default(),
-            self.node_bundle,
-        );
-        let border_node = NodeBuilder::new()
-            .border_of(Val::Px(1.), TEAL.into())
-            .background_color(Color::WHITE)
-            .spawn(commands);
-        let text_entity = commands.spawn(text).id();
+        let border_node = commands.spawn(self.border_node_bundle).id();
+        let text_entity = commands.spawn((self.text_bundle, self.text_field)).id();
         let error_text = commands
-            .spawn((
-                Text::new("Error"),
-                TextColor(RED.into()),
-                Visibility::Hidden,
-            ))
+            .spawn((self.error_text_bundle, Visibility::Hidden))
             .id();
         commands
             .entity(border_node)

@@ -26,9 +26,7 @@ pub fn setup_button_edit_panel(
         .border(UiRect::all(Val::Px(5.0)), RED.into())
         .background_color(BLUE.into())
         .spawn(commands);
-    let top_label = TextBuilder::new()
-        .content("Edit Button:")
-        .spawn(commands);
+    let top_label = TextBuilder::new().content("Edit Button:").spawn(commands);
     let key_values_panel = setup_key_value_panel(commands);
     commands
         .entity(left_container)
@@ -57,7 +55,12 @@ fn setup_key_value_panel(commands: &mut Commands) -> Entity {
 
 fn setup_border_size_edit(commands: &mut Commands) -> Entity {
     TextFieldBuilder::new()
-        .content("1.0")
+        .text_bundle(
+            TextBuilder::new()
+                .content("1.0")
+                .text_color(Color::BLACK)
+                .bundle(),
+        )
         .on_change_to_number(BUTTON_BORDER_SIZE_SOURCE)
         .spawn(commands)
 }
@@ -67,22 +70,26 @@ fn setup_text_edit_panel<S: Into<String>>(
     default_content: S,
     source_id: &'static str,
 ) -> Entity {
+    let text_bundle = TextBuilder::new()
+        .content(default_content)
+        .text_color(Color::BLACK)
+        .inner_node_bundle(NodeBuilder::new().text_field_node().bundle())
+        .bundle();
     TextFieldBuilder::new()
-        .node(NodeBuilder::new().text_field_node().bundle())
+        .text_bundle(text_bundle)
         .on_change(|button_text, commands| {
             commands.queue(|w: &mut World| {
-                println!(
-                    "Queue string update to {} to {}",
-                    button_text,
-                    source_id.to_string()
-                );
+                // println!(
+                //     "Queue string update to {} to {}",
+                //     button_text,
+                //     source_id.to_string()
+                // );
                 w.send_event(TextContentChange {
                     source_id: source_id.into(),
                     contents: button_text,
                 });
             })
         })
-        .content(default_content)
         // .on_change(|id, s, commands| println!("on_change of {}: {}", id, s))
         .spawn(commands)
 }

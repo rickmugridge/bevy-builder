@@ -26,12 +26,12 @@ fn main() {
                     }),
                     ..default()
                 })
-                .set(bevy::log::LogPlugin {
-                    // Uncomment this to override the default log settings:
-                    level: bevy::log::Level::INFO,
-                    // filter: "wgpu=warn,bevy_ecs=info".to_string(),
-                    ..default()
-                }),
+                // .set(bevy::log::LogPlugin {
+                //     // Uncomment this to override the default log settings:
+                //     level: bevy::log::Level::INFO,
+                //     // filter: "wgpu=warn,bevy_ecs=info".to_string(),
+                //     ..default()
+                // }),
         )
         .add_plugins((TextFieldPlugin, ButtonPlugin, EditPlugin))
         .insert_resource(ClearColor(Color::srgb(0.05, 0.15, 0.25)))

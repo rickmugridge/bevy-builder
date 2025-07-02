@@ -1,8 +1,8 @@
-use crate::builder::text_field_builder::TextField;
 use bevy::app::{App, Plugin};
 use bevy::color::palettes::basic::{GREEN, RED};
 use bevy::input::keyboard::{Key, KeyboardInput};
 use bevy::prelude::*;
+use crate::builder::text_field_builder::TextField;
 
 pub struct TextFieldPlugin;
 

@@ -37,7 +37,7 @@ impl ButtonBuilder {
         parent
     }
 
-    pub fn spawn_with(mut self, bundle: impl Bundle, commands: &mut Commands) -> Entity {
+    pub fn spawn_with(self, bundle: impl Bundle, commands: &mut Commands) -> Entity {
         let parent = commands.spawn((self.bundle, bundle)).id();
         commands.entity(parent).add_children(&[self.text]);
         parent

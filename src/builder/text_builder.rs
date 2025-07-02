@@ -26,13 +26,24 @@ pub struct TextBuilder {
 impl TextBuilder {
     pub fn new() -> Self {
         Self {
-            bundle: TextBundle::default(),
+            bundle: TextBundle {
+                text_shadow: TextShadow {
+                    color: Color::NONE,
+                    offset: Vec2::ZERO,
+                },
+                ..default()
+            },
             outer_node_bundle: NodeBundle::default(),
         }
-    }
+     }
 
     pub fn content<S: Into<String>>(mut self, content: S) -> Self {
         self.bundle.text = Text::new(content.into());
+        self
+    }
+    
+    pub fn text_color(mut self, text_color: Color) -> Self {
+        self.bundle.text_color = TextColor(text_color);
         self
     }
 
@@ -78,6 +89,10 @@ impl TextBuilder {
             source_id: source_id.into(),
         };
         self
+    }
+
+    pub fn bundle(self) -> TextBundle {
+        self.bundle
     }
 
     pub fn spawn(self, commands: &mut Commands) -> Entity {

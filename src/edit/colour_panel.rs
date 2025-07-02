@@ -1,12 +1,10 @@
 use crate::builder::node_builder::NodeBuilder;
 use crate::builder::text_builder::TextBuilder;
 use crate::builder::text_field_builder::TextFieldBuilder;
-use crate::ui_plugin::color_plugin::{
-    ColorValueChanged, Coloration, EditBlue, EditGreen, EditRed,
-};
+use crate::ui_plugin::color_plugin::{ColorValueChanged, Coloration, EditBlue, EditGreen, EditRed};
 use crate::ui_plugin::open_close_plugin::{OpenClose, OpenCloseReactor};
-use bevy::color::palettes::basic::{GREEN, WHITE};
 use bevy::color::Color;
+use bevy::color::palettes::basic::{GREEN, WHITE};
 use bevy::prelude::{Commands, Display, Entity, GridTrack, Interaction, Val};
 
 pub fn setup_colour_edit_panel(commands: &mut Commands, color_source_id: &str) -> Entity {
@@ -116,8 +114,13 @@ where
     F: Fn(f32, &mut Commands) + Send + Sync + 'static,
 {
     TextFieldBuilder::new()
-        .node(NodeBuilder::new().text_field_node().bundle())
-        .content("0.0")
+        .text_bundle(
+            TextBuilder::new()
+                .inner_node_bundle(NodeBuilder::new().text_field_node().bundle())
+                .content("0.0")
+                .text_color(Color::BLACK)
+                .bundle(),
+        )
         .on_change(move |button_text, commands| {
             if let Ok(value) = button_text.parse::<f32>() {
                 let clamped_value = value.clamp(0.0, 1.0);
