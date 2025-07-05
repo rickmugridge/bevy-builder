@@ -7,7 +7,7 @@ use crate::edit::sources::{
 };
 use bevy::asset::AssetServer;
 use bevy::color::palettes::basic::YELLOW;
-use bevy::color::palettes::css::GREEN;
+use bevy::color::palettes::css::{GREEN, RED};
 use bevy::prelude::Val::Px;
 use bevy::prelude::*;
 
@@ -32,6 +32,15 @@ pub fn setup_display_panel(commands: &mut Commands, _asset_server: &Res<AssetSer
         .spawn(commands);
     let button = ButtonBuilder::new(text)
         .node_bundle(button_node)
+        .on_press(|entity, commands| {
+            println!("Button pressed");
+            commands.queue(move |world: &mut World| { // todo Maybe an Event is a better approach
+                let mut query = world.query::<(&mut BackgroundColor)>();
+                if let Ok(mut background) = query.get_mut(world, entity) {
+                    background.0 = RED.into();
+                }
+            })
+        })
         .spawn(commands);
     commands.entity(border_node).add_child(button);
     border_node

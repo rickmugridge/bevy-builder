@@ -1,11 +1,21 @@
 use crate::builder::node_builder::NodeBundle;
 use bevy::prelude::*;
+use std::sync::Arc;
+
+#[derive(Component, Default)]
+#[require(Interaction)]
+pub struct ButtonResponder {
+    pub on_press: Option<ButtonPressCallback>,
+}
+
+type ButtonPressCallback = Arc<dyn Fn(Entity, &mut Commands) + Send + Sync>;
 
 #[derive(Bundle, Default)]
 pub struct ButtonBundle {
     button: Button,
     border_radius: BorderRadius,
     node_bundle: NodeBundle,
+    button_responder: ButtonResponder,
 }
 
 pub struct ButtonBuilder {
@@ -19,6 +29,14 @@ impl ButtonBuilder {
             bundle: ButtonBundle::default(),
             text,
         }
+    }
+
+    pub fn on_press<F>(mut self, callback: F) -> Self
+    where
+        F: Fn(Entity, &mut Commands) + Send + Sync + 'static,
+    {
+        self.bundle.button_responder.on_press = Some(Arc::new(callback));
+        self
     }
 
     pub fn node_bundle(mut self, node_bundle: NodeBundle) -> Self {

@@ -1,4 +1,4 @@
-use bevy::color::palettes::basic::{GREEN, RED};
+use crate::builder::button_builder::ButtonResponder;
 use bevy::prelude::*;
 
 pub const NORMAL: Color = Color::srgb(0.15, 0.15, 0.15);
@@ -9,31 +9,42 @@ pub struct ButtonPlugin;
 
 impl Plugin for ButtonPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_systems(Update, button_hover);
+        app.add_systems(Update, (button_hover, button_press));
     }
 }
 
 fn button_hover(
     mut interaction_query: Query<
-        (&Interaction, &mut BackgroundColor, &mut BorderColor),
+        (&Interaction, &mut BackgroundColor),
         (Changed<Interaction>, With<Button>),
     >,
 ) {
-    for (interaction, mut color, mut border_color) in &mut interaction_query {
+    for (interaction, mut color) in &mut interaction_query {
         match *interaction {
             Interaction::Pressed => {
-                *color = PRESSED.into();
-                border_color.0 = RED.into();
             }
             Interaction::Hovered => {
                 *color = HOVERING.into();
-                border_color.0 = GREEN.into();
             }
             Interaction::None => {
                 *color = NORMAL.into();
-                border_color.0 = Color::WHITE;
             }
+        }
+    }
+}
+
+fn button_press(
+    mut interaction_query: Query<(&Interaction, &ButtonResponder, Entity), Changed<Interaction>>,
+    mut commands: Commands,
+) {
+    for (interaction, button_responder, button_entity) in &mut interaction_query {
+        match *interaction {
+            Interaction::Pressed => {
+                if let Some(on_press) = button_responder.on_press.as_ref() {
+                    on_press(button_entity, &mut commands);
+                }
+            }
+            _ => {}
         }
     }
 }
