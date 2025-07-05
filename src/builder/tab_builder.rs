@@ -4,8 +4,16 @@ use crate::builder::text_builder::TextBuilder;
 use bevy::prelude::{Commands, Component, Entity};
 use bevy::ui::Display;
 
+#[derive(Component)]
+#[relationship(relationship_target = Tabs)]
+pub struct TabElement(Entity);
+
 #[derive(Component, Default)]
-pub struct Tab {} // todo manage state of which tab is selected
+#[relationship_target(relationship = TabElement, linked_spawn)]
+pub struct Tabs(Vec<Entity>);
+
+#[derive(Component)]
+pub struct TabContent(Entity);
 
 pub struct TabBuilder {
     menus: Vec<(String, Entity)>,
@@ -41,8 +49,9 @@ impl TabBuilder {
         let mut children: Vec<Entity> = Vec::new();
         self.menus.iter().for_each(|(text, entity)| {
             let button = ButtonBuilder::new(TextBuilder::new().content(text).spawn(commands))
-                .spawn(commands);
+                .spawn_with(TabContent(*entity), commands);
             children.push(button);
+            commands.entity(button).insert(TabElement(node));
             children.push(*entity);
         });
         commands.entity(node).add_children(&children);
